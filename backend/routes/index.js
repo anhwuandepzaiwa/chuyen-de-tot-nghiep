@@ -35,7 +35,15 @@ const allOrderController = require('../controller/order/allOrder.controller')
 const paymentZalo = require('../controller/order/paymentzalo');
 const callbackZalo = require('../controller/order/callbackZalo');
 const confirmEmailController = require('../controller/user/emailAuthentication')
+const verifyOtpController = require('../controller/user/verifyOtp')
+const refreshConfirmationData = require('../controller/user/refreshConfirmationData')
+const forgotPasswordController = require('../controller/user/forgotPassword')
+const resetPassword = require('../controller/user/resetPassword');
 
+router.post("/forgot-password", forgotPasswordController);
+router.post("/reset-password", resetPassword);
+router.post("/verify-otp", verifyOtpController);
+router.post('/refresh-confirmation', refreshConfirmationData);
 router.post("/signup",userSignUpController);
 router.post("/signin", checkEmailConfirm, userSignInController);
 router.get('/user-details', userDetailsController);

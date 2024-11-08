@@ -1,13 +1,15 @@
-const userModel = require("../../models/userModel")
-const bcrypt = require('bcryptjs');
-const sendMail = require("../../helpers/send.mail")
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const userModel = require("../../models/userModel");
+const bcrypt = require("bcryptjs");
+const sendMail = require("../../helpers/send.mail");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto"); // For generating OTP
+require("dotenv").config();
 
-async function userSignUpController(req,res){
-    try{
-        const { email, password, name} = req.body
+async function userSignUpController(req, res) {
+    try {
+        const { email, password, confirmPassword, name } = req.body;
 
+        // Validate input
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email || !emailRegex.test(email)) {
             throw new Error("Please provide a valid email");
@@ -15,12 +17,18 @@ async function userSignUpController(req,res){
         if (!password || password.length < 8) {
             throw new Error("Password should be at least 8 characters long");
         }
+        if (!confirmPassword) {
+            throw new Error("Please confirm your password");
+        }
+        if (password !== confirmPassword) {
+            throw new Error("Passwords do not match");
+        }
         if (!name) {
             throw new Error("Please provide a name");
         }
 
+        // Check if user already exists
         const existingUser = await userModel.findOne({ email });
-
         if (existingUser) {
             return res.status(400).json({
                 message: "User already exists. Please use a different email.",
@@ -28,33 +36,45 @@ async function userSignUpController(req,res){
             });
         }
 
+        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
 
+        // Generate OTP and expiration time
+        const otp = crypto.randomInt(100000, 999999);
+        const otpExpiryTime = 15 * 60 * 1000; // 15 minutes
+
+        // Create user
         const userData = new userModel({
-            ...req.body,
-            role: "GENERAL",
+            email,
             password: hashPassword,
-            isConfirmed: false // Add this field to track confirmation status
+            name,
+            role: "GENERAL",
+            isConfirmed: false,
+            otp,
+            otpExpiresAt: new Date(Date.now() + otpExpiryTime)
         });
 
         const savedUser = await userData.save();
-        // Create a token with user's id and email for email confirmation
-        const token = jwt.sign({ id: savedUser._id, email: savedUser.email }, process.env.TOKEN_SECRET_KEY, { expiresIn: '365d' });
+        const token = jwt.sign({ id: savedUser._id, email: savedUser.email }, process.env.TOKEN_SECRET_KEY, { expiresIn: '24d' });
+        savedUser.token = token;  
+        await savedUser.save();
 
-        // Send confirmation email
         const confirmationUrl = `http://localhost:8080/api/confirm-email?token=${token}`;
         await sendMail({
             email: savedUser.email,
-            subject: 'Please Confirm Your Email',
+            subject: "Please Confirm Your Email",
             html: `
                 <h1>Welcome ${name}!</h1>
-                <p>Please confirm your email by clicking the link below:</p>
-                <a href="${confirmationUrl}">Confirm Email</a>
-                <p>This link will expire in 24 hours.</p>
+                <p>To confirm your email, please use one of the following options:</p>
+                <ul>
+                    <li>Enter this OTP: <strong>${otp}</strong></li>
+                    <li>Or click the confirmation link: <a href="${confirmationUrl}">Confirm Email</a></li>
+                </ul>
+                <p>Note: The OTP expires in 15 minutes, and the link expires in 24 hours.</p>
             `
         });
-    
+
         res.status(201).json({
             data: savedUser,
             success: true,
@@ -65,7 +85,7 @@ async function userSignUpController(req,res){
         res.status(400).json({
             message: err.message || "An error occurred",
             error: true,
-            success: false,
+            success: false
         });
     }
 }

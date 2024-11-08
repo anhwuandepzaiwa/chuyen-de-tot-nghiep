@@ -6,6 +6,9 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, default: "GENERAL" },
     isConfirmed: { type: Boolean, default: false },
+    otp: { type: Number, default: null },
+    otpExpiresAt: { type: Date, default: null }, 
+    token: { type: String, required: false },
     phone: { type: String, required: false }, 
     address: { type: String, required: false } 
 }, { timestamps: true });
