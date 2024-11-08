@@ -20,7 +20,8 @@ const searchProduct = async (req, res) => {
         const products = await productModel.find({
             "$or": [
                 { productName: regex },
-                { category: regex }
+                { category: regex },
+                { subcategory: regex }
             ]
         })
         .skip((page - 1) * limit) // Bỏ qua các kết quả của trang trước

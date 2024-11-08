@@ -5,29 +5,37 @@ const productSchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
-    brandName: { 
-        type: String, 
-        required: true 
-    },
     category: { 
         type: String, 
         required: true 
+    },
+    subcategory: { 
+        type: String, 
+        required: true,
+    },
+    new: { 
+        type: Boolean, 
+        default: false 
     },
     productImage: {
         type: [String], 
         default: []
     },
-    description: { 
-        type: String, 
-        required: true 
-    },
-    price: { 
+    originalPrice: { 
         type: Number, 
         required: true 
     },
-    sellingPrice: { 
+    discountedPrice: { 
+        type: Number 
+    },
+    discountPercentage: { 
         type: Number, 
-        required: true 
+        default: function() {
+            if (this.originalPrice && this.discountedPrice) {
+                return Math.round((1 - this.discountedPrice / this.originalPrice) * 100);
+            }
+            return 0;
+        }
     },
     stock: {
         type: Number,
@@ -38,7 +46,35 @@ const productSchema = new mongoose.Schema({
     soldCount: { 
         type: Number, 
         default: 0 
-    }
+    },
+    availableColors: { 
+        type: [String], 
+        default: [] 
+    },
+    giftItems: { 
+        type: [String], 
+        default: [] 
+    },
+    description: { 
+        introduction: { 
+            type: String,  
+        },
+        usageInstructions: { 
+            type: String 
+        },
+        ingredients: { 
+            type: String 
+        },
+        basicInfo: { 
+            type: String 
+        },
+        originInfo: { 
+            type: String 
+        },
+        brandInfo: { 
+            type: String 
+        }
+    },
 }, {
     timestamps: true
 });
