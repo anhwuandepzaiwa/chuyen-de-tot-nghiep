@@ -51,4 +51,4 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-module.exports = deleteProductController;
+module.exports = deleteProduct;
