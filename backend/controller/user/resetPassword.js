@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 
 async function resetPassword(req, res) {
     try {
-        const { email, otp, newPassword } = req.body;
+        const { email, otp, newPassword, confirmPassword } = req.body;
 
         // Kiểm tra người dùng với email đó
         const user = await userModel.findOne({ email });
@@ -15,7 +15,7 @@ async function resetPassword(req, res) {
         }
 
         // Kiểm tra OTP có hợp lệ không và thời gian hết hạn
-        if (user.otp.toString() !== otp.toString()) {
+        if (user.otp.toString() != otp.toString()) {
             return res.status(400).json({
                 message: "Invalid OTP.",
                 success: false
@@ -25,6 +25,14 @@ async function resetPassword(req, res) {
         if (user.otpExpiresAt < Date.now()) {
             return res.status(400).json({
                 message: "OTP has expired.",
+                success: false
+            });
+        }
+
+        // Kiểm tra xem mật khẩu mới và xác nhận mật khẩu có khớp không
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({
+                message: "Passwords do not match.",
                 success: false
             });
         }
