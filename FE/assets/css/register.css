@@ -1,0 +1,90 @@
+.register{
+    padding: 10px 300px 50px 300px;
+}
+.form-control {
+    background-color: #e9ecef;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 15px;
+}
+.form-check-input {
+    margin-top: 0.3rem;
+}
+.form-check-label {
+    margin-right: 20px;
+}
+.btn-primary {
+    background-color: #f8b4b4;
+    border: none;
+    width: 100%;
+    padding: 10px;
+}
+.btn-primary:hover {
+    background-color: #f49797;
+}
+.text-primary {
+    color: #007bff;
+}
+.nav-tabs .nav-link {
+    border: none;
+    font-size: 1.25rem;
+}
+.nav-tabs .nav-link.active {
+    font-weight: bold;
+}
+.nav-tabs .nav-link:not(.active) {
+    color: #6c757d;
+}
+/* Các tab mặc định */
+.nav-link {
+    transition: color 0.3s ease, background-color 0.3s ease; /* Hiệu ứng chuyển màu mượt mà */
+    color: #333; /* Màu chữ mặc định là màu đen */
+    background-color: transparent; /* Không có màu nền mặc định */
+}
+
+/* Khi tab được chọn (active), màu chữ sẽ sáng lên */
+.nav-link.active {
+    color: white; /* Màu chữ sáng lên khi tab được chọn */
+    background-color: #007bff; /* Màu nền của tab đang được chọn */
+}
+
+/* Hiệu ứng khi hover (di chuột vào tab) */
+.nav-link:hover {
+    color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+
+
+.end_form{
+    width: 100%;
+
+    .btn-submit{
+        background-color: #F7ADBA;
+        height: 50px;
+        color: white;
+        font-weight: bold;
+        margin-left: 13px;
+    }
+    .btn-submit:hover{
+        background-color: #f17a92;
+        height: 50px;
+        color: white;
+        font-weight: bold;
+    }
+    .link_location{
+        line-height: 10px;
+        /* margin-top: 10px; */
+        padding-top: 10px;
+        /* border: 1px solid #111; */
+    }
+}
+@media (max-width: 1000px){
+    .register{
+        padding: 0;
+        margin-top: 50px;
+    }
+    .btn-submit{
+        margin: 0;
+    }
+}
