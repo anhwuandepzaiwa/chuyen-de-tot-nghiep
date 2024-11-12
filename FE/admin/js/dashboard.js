@@ -1,36 +1,52 @@
 async function getProducts() {
+    const myHeaders = new Headers();
+
+    const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+    };
+
     try {
-        const response = await fetch('http://localhost:8080/api/get-product?page=1&limit=5'); // Địa chỉ API trả về dữ liệu sản phẩm
+        const response = await fetch("http://localhost:8080/api/getProductFromUser?new=true&page=1&limit=5", requestOptions);
+        
+        // Check if the response is successful (status code 200)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
         const jsonResponse = await response.json();
+        console.log("API Response:", jsonResponse); // Log the entire response to inspect it
 
-        console.log(jsonResponse); // Kiểm tra cấu trúc dữ liệu trả về
+        // Check if the 'data' property exists and is an array
+        if (jsonResponse && Array.isArray(jsonResponse.data)) {
+            const products = jsonResponse.data;
+            console.log("Products array:", products); // Log the products array
 
-        // Kiểm tra nếu thuộc tính 'data' là mảng
-        const products = jsonResponse.data;
-        if (Array.isArray(products)) {
+            // Get the containers
             const productListContainer = document.getElementById('new-product');
             const productListContainer2 = document.getElementById('new-product2');
 
-            // Duyệt qua danh sách sản phẩm và tạo HTML cho mỗi sản phẩm
+            // Check if the containers exist
+            if (!productListContainer || !productListContainer2) {
+                console.error("Product containers not found on the page!");
+                return;
+            }
+
+
+            // Loop through the products and create HTML for each one
             products.forEach(product => {
-                // Tạo phần tử mới cho mỗi sản phẩm
                 const productElement = document.createElement('div');
                 productElement.classList.add('new-product');
                 productElement.classList.add('new-product2');
 
-                // Sử dụng các trường dữ liệu từ API
-                const productImage = product.productImage.length > 0 ? product.productImage[0] : '../img/default-product.png'; // Kiểm tra nếu có ảnh, nếu không thì dùng ảnh mặc định
+                // Use product fields from API response
+                const productImage = product.productImage.length > 0 ? product.productImage[0] : '../img/default-product.png';  // Default image if no product image
                 const productName = product.productName;
                 const originalPrice = product.originalPrice;
                 const discountedPrice = product.discountedPrice;
-                const  discountPercentage = product. discountPercentage;
-                const id = product._id;
-                console.log(id);
-                
-                // const price = product.price;
-                // const discountPercentage = ((price - sellingPrice) / price) * 100;
-                console.log(productName);
-                console.log(originalPrice);
+                const discountPercentage = product.discountPercentage;
+
                 productElement.innerHTML = `
                     <div class="sp-product">
                         <img src="${productImage}" alt="${productName}">
@@ -46,7 +62,7 @@ async function getProducts() {
                                 </p>
                             </div>
                             <div class="voucher">
-                                <p class="discount">-${ discountPercentage.toFixed(0)}%</p>
+                                <p class="discount">-${discountPercentage.toFixed(0)}%</p>
                             </div>
                         </div>
                         <div class="cart-product">
@@ -56,20 +72,37 @@ async function getProducts() {
                     </div>
                 `;
 
-                // Thêm sản phẩm vào cả hai container
-                const productClone1 = productElement.cloneNode(true); // Tạo bản sao cho container đầu tiên
-                const productClone2 = productElement.cloneNode(true); // Tạo bản sao cho container thứ hai
+                // Add product to both containers
+                const productClone1 = productElement.cloneNode(true);  // Clone for the first container
+                const productClone2 = productElement.cloneNode(true);  // Clone for the second container
 
                 productListContainer.appendChild(productClone1);
                 productListContainer2.appendChild(productClone2);
             });
         } else {
-            console.error('Dữ liệu không phải là mảng');
+            console.error('Data is not an array or is missing');
         }
     } catch (error) {
         console.error('Error fetching products:', error);
     }
 }
+    // Hàm này hiển thị category và thay đổi màu nền của nút đã chọn
+    function showCategory(category) {
 
-// Gọi hàm getProducts khi trang web được tải
+        // Bỏ màu nền cho tất cả các nút
+        const buttons = document.querySelectorAll('.td2 button');
+        buttons.forEach(function(button) {
+            button.classList.remove('selected');
+        });
+
+
+        // Thêm màu nền cho nút đã chọn
+        const selectedButton = document.getElementById('link-' + category);
+        if (selectedButton) {
+            selectedButton.classList.add('selected');
+        }
+    }
+
+
+// Call the getProducts function when the page loads
 window.onload = getProducts;

@@ -11,7 +11,15 @@ body, html {
     height: auto; 
     
 }
-
+.text_wrap{
+    display: flex;
+    margin-top: 20px;
+    margin-left: 450px;
+}
+#sum_product{
+    margin-top: 10px;
+    margin-left: 20px;
+}
 
 .product-card {
     margin: 15px; 

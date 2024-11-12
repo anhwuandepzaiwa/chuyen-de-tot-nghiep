@@ -331,21 +331,27 @@ body{
     
 }
 
-.td2 a {
-   padding: 30px;
-   font-size: 15px;
-   font-weight: bold;
-   border: 1px solid black;
-   margin: 10px;
-   padding: 10px;
-   border-radius: 20px;
-   height: 20px;
+.td2 button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #000;
+    background-color: transparent;  /* Nền mặc định */
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 20px;
+    margin-right: 10px;  /* Khoảng cách giữa các nút */
+    transition: background-color 0.3s ease; /* Thêm hiệu ứng chuyển màu nền */
 }
 
-.td2 a:hover {
-  background: #F7ADBA;
-  text-decoration: none;
-  color: #fff;
+        /* Khi người dùng click vào nút, đổi màu nền thành hồng */
+.td2 button.selected {
+    background-color: pink;
+    color: #fff;  /* Thay đổi màu chữ khi chọn */
+}
+
+/* Khi hover, nền nút sẽ sáng lên một chút */
+.td2 button:hover {
+    background-color: #f7c8d3;
 }
 .sp-dm{
    display: flex;

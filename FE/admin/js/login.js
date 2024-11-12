@@ -91,44 +91,43 @@ function showForgotPasswordPanel() {
     
 
 // Đăng nhập người dùng
-
-
-function login() {
-    const email = document.querySelector('.sign-in-container input[type="email"]').value;
-    const password = document.querySelector('.sign-in-container input[type="password"]').value;
-
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-        email: email,
-        password: password
-    });
-
-    const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow"
-    };
-
-    fetch("http://localhost:8080/api/signin", requestOptions)
-        .then((response) => response.json()) // Parse the response as JSON
-        .then((result) => {
-            if (result.success) {
-                console.log(result.data.isConfirmed);
-                console.log(result.data);
-
-                // Kiểm tra xem email đã xác thực chưa
-                if (result.data.isConfirmed) {
-                    window.location.href = ""; // Chuyển trang nếu email đã được xác thực
+    function login() {
+        const email = document.querySelector('.sign-in-container input[type="email"]').value;
+        const password = document.querySelector('.sign-in-container input[type="password"]').value;
+    
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+    
+        const raw = JSON.stringify({
+            email: email,
+            password: password
+        });
+    
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+    
+        fetch("http://localhost:8080/api/signin", requestOptions)
+            .then((response) => response.json()) // Parse the response as JSON
+            .then((result) => {
+                if (result.success) {
+                    console.log(result.data.isConfirmed);
+                    console.log(result.data);
+    
+                    // Kiểm tra xem email đã xác thực chưa
+                    if (result.data.isConfirmed) {
+                        window.location.href = "/chuyen-de-tot-nghiep/FE/layout/home.html"; // Chuyển trang nếu email đã được xác thực
+                    }
+                } else {
+                    alert('Đăng nhập thất bại: ' + result.message);
                 }
-            } else {
-                alert('Đăng nhập thất bại: ' + result.message);
-            }
-        })
-        .catch((error) => console.error('Error:', error)); // Log the error if fetch fails
-}
+            })
+            .catch((error) => console.error('Error:', error)); // Log the error if fetch fails
+    }
+
  // gửi otp 
  function send_otp() {
     const forgot_email = document.getElementById("forgot_email").value;
