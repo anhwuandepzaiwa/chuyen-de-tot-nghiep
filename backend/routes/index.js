@@ -23,8 +23,8 @@ const getProductDetails = require('../controller/product/getProductDetails')
 const addToCartController = require('../controller/user/addToCartController')
 const countAddToCartProduct = require('../controller/user/countAddToCartProduct')
 const addToCartViewProduct  = require('../controller/user/addToCartViewProduct')
+const deleteProductFromCart   = require('../controller/user/deleteProductFromCart')
 const updateAddToCartProduct = require('../controller/user/updateAddToCartProduct')
-const deleteAddToCartProduct = require('../controller/user/deleteAddToCartProduct')
 const searchProduct = require('../controller/product/searchProduct')
 const deleteProduct = require('../controller/product/deleteProduct')
 const filterProductController = require('../controller/product/filterProduct')
@@ -39,6 +39,10 @@ const verifyOtpController = require('../controller/user/verifyOtp')
 const refreshConfirmationData = require('../controller/user/refreshConfirmationData')
 const forgotPasswordController = require('../controller/user/forgotPassword')
 const resetPassword = require('../controller/user/resetPassword');
+const createPromotion = require('../controller/user/createPromotion');
+const updatePromotion = require('../controller/user/updatePromotion');
+const deletePromotion = require('../controller/user/deletePromotion');
+const getAllPromotions = require('../controller/user/getAllPromotions');
 
 router.post("/forgot-password", forgotPasswordController);
 router.post("/reset-password", resetPassword);
@@ -56,6 +60,10 @@ router.get("/all-user",authToken,allUsers)
 router.post("/update-user",authToken,updateUser)
 router.delete("/delete-user", authToken, isAdmin, deleteAdminUser)
 router.delete("/delete-account", authToken, deleteUser);
+router.post('/create-promotion', authToken, isAdmin, createPromotion);
+router.put('/update-promotion', authToken, isAdmin, updatePromotion);
+router.delete('/delete-promotion/:promotionId', authToken, isAdmin, deletePromotion);
+router.get('/all-promotions', authToken, isAdmin, getAllPromotions);
 
 //product
 router.post("/upload-product", authToken, isAdmin, upload.array('productImage', 6), UploadProductController)
@@ -73,7 +81,7 @@ router.post("/addtocart",authToken,addToCartController)
 router.get("/countAddToCartProduct",authToken,countAddToCartProduct)
 router.get("/view-card-product",authToken,addToCartViewProduct)
 router.post("/update-cart-product",authToken,updateAddToCartProduct)
-router.post("/delete-cart-product",authToken,deleteAddToCartProduct)
+router.delete("/delete-cart-product", authToken, deleteProductFromCart);
 
 //payment and order
 router.post('/checkout',authToken,paymentController)
