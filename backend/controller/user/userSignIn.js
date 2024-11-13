@@ -46,9 +46,9 @@ async function userSignInController(req,res)
             data: {
                 token,  
                 name: user.name,  
-                email: user.email ,
+                email: user.email,
                 isConfirmed: user.isConfirmed
-            }, 
+            },
             success : true,
             error : false
         })
