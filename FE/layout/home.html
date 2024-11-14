@@ -80,9 +80,15 @@
                             <div class="px-5 d-none d-xl-inline-block">
                                 <a
                                     class="position-relative lh-1 color-inherit text-decoration-none"
-                                    href="login.html">
+                                    href="login.html" id="text_content">
                                     Đăng kí/Đăng nhập
                                 </a>
+                                <div class="user-info" id="user-info">
+                                    <span id="greeting-text"></span>
+                                    <ul class="sign-out">
+                                        <li   onclick="sign_out()">Đăng xuất</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -966,187 +972,26 @@
                 <div class="td1">
                     <h3 >TRANG ĐIỂM</h3>
                 </div>
-                <div class="td2">
-                    <button onclick="showCategory('trangdiem')" id="link-trangdiem">Trang điểm</button>
-                    <button onclick="showCategory('sonmoi')" id="link-sonmoi">Son môi</button>
-                    <button onclick="showCategory('phannuoc')" id="link-phannuoc">Phấn nước</button>
-                    <button onclick="showCategory('trangdiemmatt')" id="link-trangdiemmatt">Trang điểm mắt</button>
-                </div>
+                    <div class="td2">
+                        <button onclick="showCategory(this)" id="link-sonmoi">Son môi</button>
+                        <button onclick="showCategory(this)" id="link-phannuoc">Phấn nước</button>
+                        <button onclick="showCategory(this)" id="link-trangdiemmatt">Trang điểm mắt</button>
+                    </div>
             </div>
 
-            <div class=" sp-dm">
+            <div class="sp-dm">
                 <div class="img-dm">
                     <img src="../img/home_tabs_1_banner.jpg" alt="">
                 </div>
-                <div class="">
-                    <div class="dm-sp">
-                        <div class="sp-product">
-                            <img src="../img/image8.png" alt="">
-                            <div class="name-product">
-                                <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                                <p class="color-options">+6 màu sắc</p>
-                            </div>
-                            <div class="price-product">
-                                <div>
-                                <p style="color: #F7ADBA;">399.000đ</p>
-                                <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                                </div>
-                                <div class="voucher">
-                                    <p class="discount">-47%</p>
-                                </div>
-                            </div>
-                            <div class="cart-product">
-                                <img src="../img/giohang.png" class="cart-icon" alt="">
-                                <p class="cart-text">Thêm vào giỏ hàng</p>
-                            </div>
-                        </div>
-                        <div class="sp-product">
-                            <img src="../img/image8.png" alt="">
-                            <div class="name-product">
-                                <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                                <p class="color-options">+6 màu sắc</p>
-                            </div>
-                            <div class="price-product">
-                                <div>
-                                <p style="color: #F7ADBA;">399.000đ</p>
-                                <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                                </div>
-                                <div class="voucher">
-                                    <p class="discount">-47%</p>
-                                </div>
-                            </div>
-                            <div class="cart-product">
-                                <img src="../img/giohang.png" class="cart-icon" alt="">
-                                <p class="cart-text">Thêm vào giỏ hàng</p>
-                            </div>
-                        </div>
-                        <div class="sp-product">
-                            <img src="../img/image8.png" alt="">
-                            <div class="name-product">
-                                <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                                <p class="color-options">+6 màu sắc</p>
-                            </div>
-                            <div class="price-product">
-                                <div>
-                                <p style="color: #F7ADBA;">399.000đ</p>
-                                <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                                </div>
-                                <div class="voucher">
-                                    <p class="discount">-47%</p>
-                                </div>
-                            </div>
-                            <div class="cart-product">
-                                <img src="../img/giohang.png" class="cart-icon" alt="">
-                                <p class="cart-text">Thêm vào giỏ hàng</p>
-                            </div>
-                        </div>
-                        <div class="sp-product">
-                            <img src="../img/image8.png" alt="">
-                            <div class="name-product">
-                                <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                                <p class="color-options">+6 màu sắc</p>
-                            </div>
-                            <div class="price-product">
-                                <div>
-                                <p style="color: #F7ADBA;">399.000đ</p>
-                                <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                                </div>
-                                <div class="voucher">
-                                    <p class="discount">-47%</p>
-                                </div>
-                            </div>
-                            <div class="cart-product">
-                                <img src="../img/giohang.png" class="cart-icon" alt="">
-                                <p class="cart-text">Thêm vào giỏ hàng</p>
-                            </div>
-                        </div>
-                    </div>
-                
-                <div class="dm-sp">
-                    <div class="sp-product">
-                        <img src="../img/image8.png" alt="">
-                        <div class="name-product">
-                            <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                            <p class="color-options">+6 màu sắc</p>
-                        </div>
-                        <div class="price-product">
-                            <div>
-                            <p style="color: #F7ADBA;">399.000đ</p>
-                            <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                            </div>
-                            <div class="voucher">
-                                <p class="discount">-47%</p>
-                            </div>
-                        </div>
-                        <div class="cart-product">
-                            <img src="../img/giohang.png" class="cart-icon" alt="">
-                            <p class="cart-text">Thêm vào giỏ hàng</p>
-                        </div>
-                    </div>
-                    <div class="sp-product">
-                        <img src="../img/image8.png" alt="">
-                        <div class="name-product">
-                            <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                            <p class="color-options">+6 màu sắc</p>
-                        </div>
-                        <div class="price-product">
-                            <div>
-                            <p style="color: #F7ADBA;">399.000đ</p>
-                            <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                            </div>
-                            <div class="voucher">
-                                <p class="discount">-47%</p>
-                            </div>
-                        </div>
-                        <div class="cart-product">
-                            <img src="../img/giohang.png" class="cart-icon" alt="">
-                            <p class="cart-text">Thêm vào giỏ hàng</p>
-                        </div>
-                    </div>
-                    <div class="sp-product">
-                        <img src="../img/image8.png" alt="">
-                        <div class="name-product">
-                            <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                            <p class="color-options">+6 màu sắc</p>
-                        </div>
-                        <div class="price-product">
-                            <div>
-                            <p style="color: #F7ADBA;">399.000đ</p>
-                            <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                            </div>
-                            <div class="voucher">
-                                <p class="discount">-47%</p>
-                            </div>
-                        </div>
-                        <div class="cart-product">
-                            <img src="../img/giohang.png" class="cart-icon" alt="">
-                            <p class="cart-text">Thêm vào giỏ hàng</p>
-                        </div>
-                    </div>
-                    <div class="sp-product">
-                        <img src="../img/image8.png" alt="">
-                        <div class="name-product">
-                            <strong>Phấn phủ phấn nén kiềm dầu hồng baby CARSLAN </strong>
-                            <p class="color-options">+6 màu sắc</p>
-                        </div>
-                        <div class="price-product">
-                            <div>
-                            <p style="color: #F7ADBA;">399.000đ</p>
-                            <p   style=" text-decoration: line-through; opacity: 0.5; font-size: 18px;">599.000đ</p>
-                            </div>
-                            <div class="voucher">
-                                <p class="discount">-47%</p>
-                            </div>
-                        </div>
-                        <div class="cart-product">
-                            <img src="../img/giohang.png" class="cart-icon" alt="">
-                            <p class="cart-text">Thêm vào giỏ hàng</p>
-                        </div>
-                    </div>
-                </div>
-               </div>
+        
+                <div class="dm-sp" onclick="detail_product()"></div>
+        
+                <!-- Phân trang -->
+                <div class="pagination"></div>  <!-- Để chứa các nút phân trang -->
             </div>
         </div>
+        
+
 
         <div class=" container trangdiem">
             <div class="dm-td">
@@ -1161,7 +1006,7 @@
                 </div>
             </div>
 
-            <div class=" sp-dm">
+            <!-- <div class=" sp-dm">
                 <div class="img-dm">
                     <img src="../img/home_tabs_1_banner.jpg" alt="">
                 </div>
@@ -1333,7 +1178,7 @@
                 </div>
                 
                </div>
-            </div>
+            </div> -->
         </div>
 
     

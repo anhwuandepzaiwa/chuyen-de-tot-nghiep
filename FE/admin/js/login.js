@@ -5,8 +5,8 @@ function showLoginPanel() {
     document.getElementById("login-panel").style.display = "block";
 
     // Cập nhật trạng thái active cho tab
-    document.getElementById("login-tab").classList.add("active");
-    document.getElementById("register-tab").classList.remove("active");
+    // document.getElementById("login-tab").classList.add("active");
+    // document.getElementById("register-tab").classList.remove("active");
 }
 
 function showRegisterPanel() {
@@ -44,8 +44,8 @@ function showForgotPasswordPanel() {
     // Gửi yêu cầu đăng ký
     function register() {
         const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        const email = document.getElementById('sign-up-email').value;
+        const password = document.getElementById('sign-up-password').value;
         const cfpassword = document.getElementById('cfpassword').value;
     
         const myHeaders = new Headers();
@@ -69,15 +69,11 @@ function showForgotPasswordPanel() {
             .then((response) => response.json()) // Sử dụng .json() để parse JSON trực tiếp
             .then((result) => {
                 if (result.success) {  // Kiểm tra xem kết quả có thành công không
-                    const token = result.data.token;  // Lấy token từ kết quả trả về
-                    const name = result.data.name;  // Lấy tên người dùng từ kết quả
-    
-                    // Lưu token vào cookies (ví dụ: với thời gian hết hạn 7 ngày)
-                    document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60};`; // Token sẽ hết hạn sau 7 ngày
-                    document.cookie = `name=${name}; path=/; max-age=${7 * 24 * 60 * 60};`; // Lưu tên người dùng vào cookie
+                    alert('Đăng ký thành công');
+                    console.log(result.data);
     
                     // Chuyển hướng đến trang đăng nhập (hoặc trang bạn muốn)
-                    showLoginPanel(); // Thay "/login" bằng đường dẫn thực tế của bạn
+                    // showLoginPanel(); // Thay "/login" bằng đường dẫn thực tế của bạn
                 } else {
                     // Nếu không thành công, hiển thị thông báo lỗi
                     alert(result.message);
@@ -92,9 +88,9 @@ function showForgotPasswordPanel() {
 
 // Đăng nhập người dùng
     function login() {
-        const email = document.querySelector('.sign-in-container input[type="email"]').value;
-        const password = document.querySelector('.sign-in-container input[type="password"]').value;
-    
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        console.log(email);
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
     
@@ -118,7 +114,13 @@ function showForgotPasswordPanel() {
                     console.log(result.data);
     
                     // Kiểm tra xem email đã xác thực chưa
-                    if (result.data.isConfirmed) {
+                    if (result.data.isConfirmed) { 
+                        const token = result.data.token;  // Lấy token từ kết quả trả về
+                        const name = result.data.name; 
+                        // Lưu token vào cookies (ví dụ: với thời gian hết hạn 7 ngày)
+                        document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60};`; // Token sẽ hết hạn sau 7 ngày
+                        document.cookie = `name=${name}; path=/; max-age=${7 * 24 * 60 * 60};`; // Lưu tên người dùng vào cookie
+                        alert("Đăng nhập thành công");
                         window.location.href = "/chuyen-de-tot-nghiep/FE/layout/home.html"; // Chuyển trang nếu email đã được xác thực
                     }
                 } else {

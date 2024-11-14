@@ -330,7 +330,6 @@ body{
     
     
 }
-
 .td2 button {
     padding: 10px 20px;
     font-size: 16px;
@@ -343,8 +342,8 @@ body{
     transition: background-color 0.3s ease; /* Thêm hiệu ứng chuyển màu nền */
 }
 
-        /* Khi người dùng click vào nút, đổi màu nền thành hồng */
-.td2 button.selected {
+/* Khi người dùng click vào nút, đổi màu nền thành hồng */
+.td2 button.active{
     background-color: pink;
     color: #fff;  /* Thay đổi màu chữ khi chọn */
 }
@@ -353,9 +352,25 @@ body{
 .td2 button:hover {
     background-color: #f7c8d3;
 }
+.panel-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.panel {
+    display: none;  /* Các panel ẩn đi khi chưa được chọn */
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
+.panel.active {
+    display: block;  /* Panel được chọn sẽ hiển thị */
+}
 .sp-dm{
    display: flex;
-   justify-content: center;
+   justify-content: center ;
    padding: 70px;
 }
 .img-dm img{
@@ -363,11 +378,36 @@ body{
     height: auto;
     
 }
+.sign-out > li{
+    list-style: none;
+    padding: 10px;
+    width: 110px;
+    color: white;
+    cursor: pointer;
+    background-color: pink;
+    position: absolute;
+    top: 100px;
+    right: 67px;
+    z-index: 2;
+}
+/* Khi hover vào phần tử chứa thông tin người dùng, sẽ hiển thị menu Đăng xuất */
+.user-info:hover .sign-out {
+    display: block; /* Hiển thị menu khi hover vào */
+}
+
+/* Thêm chút kiểu dáng cho phần tử chứa tên người dùng */
+.user-info {
+    display: inline-block;
+    cursor: pointer;
+    padding: 10px;
+}
 .dm-sp{
     display: flex;
-    justify-content: space-between;
-    
+    justify-content: center;
 }
+/* #product-list{
+    margin-right: -180px;
+} */
 
 
   

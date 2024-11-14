@@ -16,12 +16,9 @@ async function getProducts() {
         }
 
         const jsonResponse = await response.json();
-        console.log("API Response:", jsonResponse); // Log the entire response to inspect it
-
         // Check if the 'data' property exists and is an array
         if (jsonResponse && Array.isArray(jsonResponse.data)) {
             const products = jsonResponse.data;
-            console.log("Products array:", products); // Log the products array
 
             // Get the containers
             const productListContainer = document.getElementById('new-product');
@@ -86,22 +83,181 @@ async function getProducts() {
         console.error('Error fetching products:', error);
     }
 }
-    // Hàm này hiển thị category và thay đổi màu nền của nút đã chọn
-    function showCategory(category) {
+let currentPage = 1;  // Mặc định là trang đầu tiên
+let currentCategory = 'Trang ';  // Mặc định là danh mục Trang điểm
 
-        // Bỏ màu nền cho tất cả các nút
-        const buttons = document.querySelectorAll('.td2 button');
-        buttons.forEach(function(button) {
-            button.classList.remove('selected');
-        });
+// Fetch sản phẩm từ API
+function fetchProducts(category, page = 1) {
+    const myHeaders = new Headers();
+    const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+    };
 
+    fetch(`http://localhost:8080/api/getProductFromUser?subcategory=${category}&new=true&page=${page}&limit=8`, requestOptions)
+        .then(response => response.json())  // Parse JSON response
+        .then(result => {
+            console.log(result.data); // Log sản phẩm vào console
+            console.log(category);
+            displayProducts(result.data); // Hiển thị sản phẩm
+            updatePagination(result.totalPages); // Cập nhật phân trang
+        })
+        .catch(error => console.error("Error fetching products:", error));
+}
 
-        // Thêm màu nền cho nút đã chọn
-        const selectedButton = document.getElementById('link-' + category);
-        if (selectedButton) {
-            selectedButton.classList.add('selected');
+// Hiển thị sản phẩm trong HTML
+function displayProducts(products) {
+    // Tạo 2 div để chứa các sản phẩm
+    const firstContainer = document.createElement('div');  // Để chứa 4 sản phẩm đầu tiên
+    const secondContainer = document.createElement('div'); // Để chứa 4 sản phẩm tiếp theo
+
+    firstContainer.classList.add('dm-sp'); // Class cho khối 1
+    secondContainer.classList.add('dm-sp'); // Class cho khối 2
+
+    // Duyệt qua các sản phẩm và chia thành 2 nhóm (4 sản phẩm mỗi nhóm)
+    products.forEach((product, index) => {
+        // Tạo phần tử sản phẩm
+        const productElement = `
+            <div class="sp-product">
+                <img src="${product.productImage[0] || '../img/default.png'}" alt="${product.productName}">
+                <div class="name-product">
+                    <strong>${product.productName}</strong>
+                    <p class="color-options">+${product.availableColors.length} màu sắc</p>
+                </div>
+                <div class="price-product">
+                    <div>
+                        <p style="color: #F7ADBA;">${product.discountedPrice ? product.discountedPrice : product.originalPrice}đ</p>
+                        <p style="text-decoration: line-through; opacity: 0.5; font-size: 18px;">${product.originalPrice}đ</p>
+                    </div>
+                    <div class="voucher">
+                        <p class="discount">-${product.discountPercentage}%</p>
+                    </div>
+                </div>
+                <div class="cart-product">
+                    <img src="../img/giohang.png" class="cart-icon" alt="Thêm vào giỏ hàng">
+                    <p class="cart-text">Thêm vào giỏ hàng</p>
+                </div>
+            </div>
+        `;
+
+        // Nếu sản phẩm là trong 4 sản phẩm đầu tiên
+        if (index < 4) {
+            firstContainer.innerHTML += productElement; // Thêm vào firstContainer
+        } else if (index >= 4) {
+            secondContainer.innerHTML += productElement; // Thêm vào secondContainer
         }
+    });
+
+    // Lấy phần tử chứa sản phẩm trên trang (ví dụ: .dm-sp)
+    const productContainer = document.querySelector('.dm-sp');
+    productContainer.innerHTML = '';  // Xóa sản phẩm cũ
+
+    // Thêm 2 khối div (mỗi khối chứa 4 sản phẩm)
+    productContainer.appendChild(firstContainer);
+    productContainer.appendChild(secondContainer);
+}
+
+
+
+// Cập nhật phân trang
+function updatePagination(totalPages) {
+    const paginationContainer = document.querySelector('.pagination');
+    paginationContainer.innerHTML = '';  // Xóa phân trang cũ
+
+    // Nút "Trước"
+    const prevButton = document.createElement('button');
+    prevButton.innerText = 'Trước';
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => {
+        if (currentPage > 1) {
+            currentPage--;
+            fetchProducts(currentCategory, currentPage);
+        }
+    };
+    paginationContainer.appendChild(prevButton);
+
+    // Các nút trang
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.innerText = i;
+        pageButton.classList.toggle('active', i === currentPage);  // Đánh dấu trang hiện tại
+        pageButton.onclick = () => {
+            currentPage = i;
+            fetchProducts(currentCategory, currentPage);
+        };
+        paginationContainer.appendChild(pageButton);
     }
+
+    // Nút "Tiếp theo"
+    const nextButton = document.createElement('button');
+    nextButton.innerText = 'Tiếp theo';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            fetchProducts(currentCategory, currentPage);
+        }
+    };
+    paginationContainer.appendChild(nextButton);
+}
+
+// Lấy và hiển thị sản phẩm theo category
+function showCategory(button) {
+    const category = button.textContent;  // Lấy giá trị text của button và chuẩn hóa
+    currentCategory = category;
+    currentPage = 1;  // Quay lại trang đầu tiên khi thay đổi danh mục
+    fetchProducts(currentCategory, currentPage);  // Lấy sản phẩm của category mới
+}
+
+// Fetch sản phẩm khi trang load
+document.addEventListener('DOMContentLoaded', () => {
+    // Lấy phần tử Xin chào và Đăng kí/Đăng nhập
+    let textElement = document.getElementById('text_content');
+    let greetingText = document.getElementById('greeting-text');
+    const userInfo = document.getElementById('user-info');
+    const dang_xuat = document.getElementById('sign-out');
+
+    // Kiểm tra sự tồn tại của cookie "username"
+    let username = getCookie('name'); // Lấy cookie username
+
+    // Nếu cookie "username" tồn tại, hiển thị thông tin và nút Đăng xuất
+    if (username) {
+        // Thay đổi nội dung văn bản của phần tử Đăng kí/Đăng nhập thành "Xin chào [username]"
+        greetingText.textContent = "Xin chào, " + username;
+        // Ẩn liên kết Đăng kí/Đăng nhập
+        textElement.style.display = 'none'; // Ẩn liên kết Đăng kí/Đăng nhập
+        // Hiển thị phần tử chứa tên người dùng và Đăng xuất
+        userInfo.style.display = 'block'; // Hiển thị thông tin người dùng
+    } else {
+        // Nếu không có cookie "username", vẫn giữ liên kết "Đăng kí/Đăng nhập"
+        greetingText.textContent = "";
+        userInfo.style.display = 'none'; // Ẩn phần tử chứa tên người dùng
+    }
+});
+
+// Hàm lấy giá trị cookie
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null; // Nếu cookie tồn tại, trả về giá trị, nếu không trả về null
+}
+
+// Hàm xóa tất cả cookies
+function deleteAllCookies() {
+    const cookies = document.cookie.split(';');
+    cookies.forEach(cookie => {
+        const cookieName = cookie.split('=')[0].trim();
+        document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"; // Đặt cookie với ngày hết hạn trong quá khứ
+    });
+}
+
+// Hàm Đăng xuất
+function sign_out() {
+    deleteAllCookies(); // Xóa tất cả cookies
+    window.location.href = "home.html"; // Chuyển hướng về trang chủ hoặc trang đăng nhập
+}
+
+
 
 
 // Call the getProducts function when the page loads
