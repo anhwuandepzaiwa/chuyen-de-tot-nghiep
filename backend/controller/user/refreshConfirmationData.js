@@ -24,7 +24,17 @@ async function refreshConfirmationData(req, res) {
 
         // Check if the OTP or confirmation link has expired
         const otpExpired = user.otpExpiresAt < Date.now();
-        const linkExpired = !user.isConfirmed && jwt.verify(user.token, process.env.TOKEN_SECRET_KEY).exp < Date.now() / 1000;
+
+        // Ensure the token exists before checking the expiration
+        let linkExpired = false;
+        if (user.token) {
+            try {
+                linkExpired = !user.isConfirmed && jwt.verify(user.token, process.env.TOKEN_SECRET_KEY).exp < Date.now() / 1000;
+            } catch (err) {
+                console.error('Error verifying token:', err);
+                linkExpired = true;  // If there's an error verifying the token, treat it as expired
+            }
+        }
 
         if (!otpExpired && !linkExpired) {
             return res.status(400).json({
