@@ -216,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let textElement = document.getElementById('text_content');
     let greetingText = document.getElementById('greeting-text');
     const userInfo = document.getElementById('user-info');
-    const dang_xuat = document.getElementById('sign-out');
 
     // Kiểm tra sự tồn tại của cookie "username"
     let username = getCookie('name'); // Lấy cookie username
@@ -256,7 +255,26 @@ function sign_out() {
     deleteAllCookies(); // Xóa tất cả cookies
     window.location.href = "home.html"; // Chuyển hướng về trang chủ hoặc trang đăng nhập
 }
+function detail_product(){
+    const myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
 
+const raw = JSON.stringify({
+  "productId": "672e3dec9c496002edcb84ce"
+});
+
+const requestOptions = {
+  method: "POST",
+  headers: myHeaders,
+  body: raw,
+  redirect: "follow"
+};
+
+fetch("http://localhost:8080/api/product-details", requestOptions)
+  .then((response) => response.text())
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+}
 
 
 
