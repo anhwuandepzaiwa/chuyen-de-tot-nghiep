@@ -1,6 +1,6 @@
 const getProductDetails = async (req, res) => {
     try {
-        const { productId } = req.params; // Lấy từ req.params
+        const { productId } = req.query; // Lấy từ req.query
 
         if (!productId) {
             return res.status(400).json({
