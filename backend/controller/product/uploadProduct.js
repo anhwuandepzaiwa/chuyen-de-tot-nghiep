@@ -21,6 +21,10 @@ async function UploadProductController(req, res) {
         // Thêm ảnh vào request body
         req.body.productImage = productImage;
 
+        if (req.body.availableColors) {
+            req.body.availableColors = req.body.availableColors.split(','); // Chuyển thành mảng
+        }
+        
         // Tạo sản phẩm mới và lưu vào MongoDB
         const uploadProduct = new productModel(req.body);
         const saveProduct = await uploadProduct.save();
