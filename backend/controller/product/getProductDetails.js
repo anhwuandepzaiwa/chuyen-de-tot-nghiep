@@ -1,8 +1,6 @@
-const productModel = require("../../models/productModel");
-
 const getProductDetails = async (req, res) => {
     try {
-        const { productId } = req.body;
+        const { productId } = req.params; // Lấy từ req.params
 
         if (!productId) {
             return res.status(400).json({
