@@ -1,3 +1,5 @@
+const productModel = require("../../models/productModel");
+
 const getProductDetails = async (req, res) => {
     try {
         const { productId } = req.query; // Lấy từ req.query
@@ -38,3 +40,4 @@ const getProductDetails = async (req, res) => {
 };
 
 module.exports = getProductDetails;
+
