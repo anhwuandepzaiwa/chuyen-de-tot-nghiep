@@ -3,15 +3,10 @@ const jwt = require('jsonwebtoken');
 // Middleware for authentication
 async function authToken(req, res, next) {
     try {
-        const token = req.cookies?.token;
-
-        if (!token) {
-            return res.status(401).json({
-                message: "Please Login...!",
-                error: true,
-                success: false,
-            });
-        }
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        if (!token)
+            return res.status(403).json({ error: "Please provide a token" })
 
         jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, decoded) => {
             if (err) {
