@@ -16,6 +16,156 @@
         <link rel="stylesheet" href="../assets/css/footer.css">
         <link rel="stylesheet" href="../assets/css/theme.css">
         <link rel="stylesheet" href="../assets/css/header.css">
+        <!-- Đặt ở cuối body -->
+<script>
+    // Utility functions
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+    function updateQuantity(productId, quantity){
+        const token = getCookie('token');
+        let currentQuantity = document.querySelector(`input[data-product-id="${productId}"]`);
+        console.log(currentQuantity);
+        // Chuyển đổi sang số
+        currentQuantity = parseInt(currentQuantity);
+        
+        // Kiểm tra nếu đang giảm số lượng và số lượng hiện tại là 1
+        if (quantity < currentQuantity && currentQuantity === 1) {
+            console.log("Không thể giảm số lượng dưới 1");
+            return;
+        }
+
+        // Cập nhật số lượng mới
+        let newQuantity = quantity > currentQuantity ? currentQuantity + 1 : currentQuantity - 1;
+        
+        // Cập nhật hiển thị số lượng trên input
+        document.querySelector(`input[data-product-id="${productId}"]`).value = newQuantity;
+        
+        // Cập nhật tổng giá
+        const priceElement = document.querySelector(`[data-price-id="${productId}"]`);
+        const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
+        const newTotal = unitPrice * newQuantity;
+        priceElement.textContent = formatPrice(newTotal);
+        
+        // Cập nhật tổng giỏ hàng
+        updateCartTotal();
+    }   
+    function loadCart() {
+        console.log("LoadCart function called");
+        const token = getCookie('token');
+        
+        fetch("http://localhost:8080/api/view-card-product", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Cart Data:", data);
+            console.log(data.data);
+            document.getElementById('cart-count').textContent = data.data.totalQuantity;
+            document.getElementById('cart-item-count').textContent = data.data.totalQuantity + ' sản phẩm';
+            if (data.data.cartDetails && data.data.cartDetails.length > 0) {
+                displayCartItems(data.data.cartDetails);
+                // updateCartSummary(data.data.cartDetails);
+                // updateShippingProgress(data);
+                // updateCartCount(data);
+            } else {
+                displayEmptyCart();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            displayEmptyCart();
+        });
+    }
+
+    function displayCartItems(data) {
+        
+        const cartContainer = document.getElementById('cart-items');
+        let cartHTML = '';
+        console.log(data);
+        data.forEach(item => {
+            
+            cartHTML += `
+                <div class="cart-item mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <img src="${item.productImage}" alt="" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="product-name mb-1">${item.productName}</h6>
+                            <p class="text-muted mb-0">Mã SP: ${item.productId || 'N/A'}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="price-section">
+                                <span class="current-price">${formatPrice(item.price)}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="quantity-controls d-flex align-items-center">
+                                <button class="btn btn-outline-secondary btn-sm" 
+                                    onclick="updateQuantity('${item.productId}', ${item.quantity - 1})">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="mx-2">${item.quantity}</span>
+                                <button class="btn btn-outline-secondary btn-sm" 
+                                    onclick="updateQuantity('${item.productId}', ${item.quantity + 1})">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="d-flex flex-column align-items-end">
+                                <span class="fw-bold mb-2">${formatPrice(item.price * item.quantity)}</span>
+                                <button class="btn btn-link text-danger p-0" 
+                                    onclick="removeFromCart('${item._id}')">
+                                    <i class="fas fa-trash-alt"></i> Xóa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        cartContainer.innerHTML = cartHTML;
+    }
+
+    function displayEmptyCart() {
+        const cartContainer = document.getElementById('cart-items');
+        cartContainer.innerHTML = `
+            <div class="text-center py-5">
+                <h4>Giỏ hàng của bạn đang trống</h4>
+                <p>Hãy thêm sản phẩm vào giỏ hàng của bạn.</p>
+                <a href="/products.html" class="btn btn-primary mt-3">Tiếp tục mua sắm</a>
+            </div>
+        `;
+        
+        document.querySelector('.subtotal').textContent = '0đ';
+        document.querySelector('.shipping-fee').textContent = '0đ';
+        document.querySelector('.discount').textContent = '0đ';
+        document.querySelector('.total-price').textContent = '0đ';
+        document.getElementById('cart-count').textContent = '0';
+        document.getElementById('cart-item-count').textContent = '0 sản phẩm';
+    }
+
+
+    // Initialize cart when page loads
+    document.addEventListener('DOMContentLoaded', loadCart);
+</script>
     </head>
     <body>
         <header id="header"
@@ -869,192 +1019,110 @@
                 </div>
             </header>
 
-            <main id="content" class="wrapper layout-page">
-                <section>
-                    <div class="container mt-8">
-                        <!-- start content -->
-                        <div aria-label="breadcrumb">
-                            <ol class="breadcrumb ">
-                                <li class="breadcrumb-item ">
-                                    Trang chủ
-                                </li>
-                                <li aria-current="page"
-                                    class="breadcrumb-item active">
-                                    Giỏ hàng (2)
-                                </li>
-                            </ol>
-                        </div>
-                        <div class="cart_header">
-                            <h4>Giỏ hàng của bạn</h4>
-                            <p class="text-end">
-                                Bạn đang có <strong> 2 sản phẩm </strong> trong
-                                giỏ hàng
-                            </p>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-8 p-4">
-                                <p>
-                                    Bạn cần mua thêm
-                                    <span style="color: red;">101,000 VND</span>
-                                    để được
-                                    <strong>MIỄN PHÍ VẬN CHUYỂN (TỐI ĐA 15.000
-                                        VND)</strong>
-                                </p>
-                                <div class="prog_bar"></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-8 p-2">
-                                <div class="left_item">
-                                    <div class="list_pro_item mb-5">
-                                        <div class="cart-item">
-                                            <div class="d-flex">
-                                                <img
-                                                    alt="Product image of Son Kem M.O.I Phiên Bản Mùa Xuân"
-                                                    height="50"
-                                                    src="https://storage.googleapis.com/a1aa/image/vVGphcnAPUpjHlz18FJ5DtcbAKjjcIzq92GMSWGrYWLa864E.jpg"
-                                                    width="50" />
-                                                <div class="ms-3">
-                                                    <p>
-                                                        Son Kem M.O.I Phiên Bản
-                                                        Mùa Xuân
-                                                        [Giảm 50%]
-                                                    </p>
-                                                    <div class="descrip_gray">
-                                                        <p>
-                                                            NO4 ROSE HONG ANH
-                                                            DAT
-                                                        </p>
-                                                        <p>
-                                                            <span>
-                                                                199,000 VND
-                                                            </span>
-                                                            <span
-                                                                style="text-decoration: line-through;">
-                                                                499,000 VND
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="cart-item">
-                                            <div class="d-flex">
-                                                <img
-                                                    alt="Product image of Son Kem M.O.I Phiên Bản Mùa Xuân"
-                                                    height="50"
-                                                    src="https://storage.googleapis.com/a1aa/image/vVGphcnAPUpjHlz18FJ5DtcbAKjjcIzq92GMSWGrYWLa864E.jpg"
-                                                    width="50" />
-                                                <div class="ms-3">
-                                                    <p>
-                                                        Son Kem M.O.I Phiên Bản
-                                                        Mùa Xuân
-                                                        [Giảm 50%]
-                                                    </p>
-                                                    <div class="descrip_gray">
-                                                        <p>
-                                                            NO4 ROSE HONG ANH
-                                                            DAT
-                                                        </p>
-                                                        <p>
-                                                            <span>
-                                                                199,000 VND
-                                                            </span>
-                                                            <span
-                                                                style="text-decoration: line-through;">
-                                                                499,000 VND
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="note_cart mb-3">
-                                        <label class="form-label"
-                                            for="order-notes">
-                                            Ghi chú đơn hàng
-                                        </label>
-                                        <textarea class="form-control"
-                                            id="order-notes"
-                                            rows="5"></textarea>
-                                    </div>
-                                </div>
+    <!-- ... phần header giữ nguyên ... -->
 
-                            </div>
-                            <div class="col-md-4 mb-5">
-                                <div class="right_item">
-                                    <h5>
-                                        Thông tin đơn hàng
-                                    </h5>
-                                    <div class="price">
-                                        <p>Tổng tiền:</p>
-                                        <span class="total-price">
-                                            199,000đ
-                                        </span>
-                                    </div>
-                                    <ul>
-                                        <li>
-                                            Miễn phí vận chuyển tối đa 15k cho
-                                            đơn hàng từ
-                                            499k , mã giảm giá (nếu có) phải
-                                            được ở trang
-                                            thanh
-                                            toán
-                                        </li>
-                                        <li>
-                                            Đơn từ 799k tặng thêm 1 túi nơ hồng
-                                            giá trị 399k
-                                            (Quà không hiện thị trong giỏ hàng)
-                                        </li>
-                                    </ul>
-                                    <button class="btn btn-checkout w-100 mb-4">
-                                        THANH TOÁN
-                                    </button>
-                                    <div class="policy mb-4">
-                                        <h6>
-                                            Chính sách mua hàng :
-                                        </h6>
-                                        <p>
-                                            Hiện chúng tôi chỉ áp dụng thanh
-                                            toán với đơn
-                                            hàng có giá trị tối thiểu 98.000 Đ
-                                            trở lên
-                                        </p>
-                                    </div>
-                                    <div class="promotion">
-                                        <h4>
-                                            KHUYEN MAI DÀNH CHO BẠN
-                                        </h4>
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon_voucher">
-                                                <img src="../img/voucher.png"
-                                                    alt>
-                                            </div>
-                                            <div class="promo-code">
-                                                <h2>
-                                                    Giảm 15K
-                                                </h2>
-                                                <p>
-                                                    Cho mọi đơn hàng bất kì
-                                                </p>
-                                                <p>
-                                                    Mã: FPDLY
-                                                </p>
-                                                <p>
-                                                    Hạn sử dụng: 30/12/2024
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+<main id="content" class="wrapper layout-page">
+    <section>
+        <div class="container mt-8">
+            <!-- Breadcrumb -->
+            <div aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="home.html">Trang chủ</a>
+                    </li>
+                    <li aria-current="page" class="breadcrumb-item active">
+                        Giỏ hàng (<span id="cart-count"></span>)
+                    </li>
+                </ol>
+            </div>
 
-                            </div>
+            <!-- Cart Header -->
+            <div class="cart_header">
+                <h4>Giỏ hàng của bạn</h4>
+                <p class="text-end">
+                    Bạn đang có <strong id="cart-item-count"></strong> trong giỏ hàng
+                </p>
+            </div>
+
+            <!-- Free Shipping Progress -->
+            <div class="row">
+                <div class="col-md-8 p-4" id="shipping-progress">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Cart Items -->
+                <div class="col-md-8 p-2">
+                    <div class="left_item">
+                        <div class="list_pro_item mb-5" id="cart-items">
+                            <!-- Cart items will be dynamically inserted here -->
                         </div>
-                        <!-- end content -->
+                        
+                        <!-- Order Notes -->
+                        <div class="note_cart mb-3">
+                            <label class="form-label" for="order-notes">
+                                Ghi chú đơn hàng
+                            </label>
+                            <textarea class="form-control" id="order-notes" rows="5"></textarea>
+                        </div>
                     </div>
-                </section>
-            </main>
+                </div>
+
+                <!-- Cart Summary -->
+                <div class="col-md-4 mb-5">
+                    <div class="right_item">
+                        <h5>Thông tin đơn hàng</h5>
+                        <div class="price-summary">
+                            <div class="d-flex justify-content-between mb-2">
+                                <p>Tạm tính:</p>
+                                <span class="subtotal">0đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <p>Phí vận chuyển:</p>
+                                <span class="shipping-fee">0đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <p>Giảm giá:</p>
+                                <span class="discount">0đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between total-section">
+                                <p><strong>Tổng tiền:</strong></p>
+                                <span class="total-price"><strong>0đ</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Info -->
+                        <div class="shipping-info mt-4">
+                            <ul>
+                                <li>Miễn phí vận chuyển tối đa 15k cho đơn hàng từ 499k</li>
+                                <li>Đơn từ 799k tặng thêm 1 túi nơ hồng giá trị 399k</li>
+                            </ul>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <button class="btn btn-checkout w-100 mb-4" onclick="proceedToCheckout()">
+                            THANH TOÁN
+                        </button>
+
+                        <!-- Policy -->
+                        <div class="policy mb-4">
+                            <h6>Chính sách mua hàng:</h6>
+                            <p>Hiện chúng tôi chỉ áp dụng thanh toán với đơn hàng có giá trị tối thiểu 98.000đ trở lên</p>
+                        </div>
+
+                        <!-- Promotions -->
+                        <div class="promotion" id="available-promotions">
+                            <!-- Promotions will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- ... phần footer giữ nguyên ... -->
             <footer class="pt-lg-10 pb-10 footer">
                 <div class="container">
                     <div class="row mt-4 mb-5">

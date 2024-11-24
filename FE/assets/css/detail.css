@@ -88,8 +88,8 @@ display: flex;
 align-items: center;
 
 }.soluong{
-width: 30px;
-font-size: 13px;
+width: 50px;
+font-size: 20px;
 }
 .product-price{
     font-weight: 700;
@@ -180,12 +180,6 @@ color: white;
 .descption{
     background-color: #fee3ec;
     padding: 30px;
-}.xemthem{
-padding: 10px;
-border-radius: 2px;
-color: #fee3ec;
-border: none;
-font-size: 12px;
 }
 .spyth{
     margin: 40px;
@@ -239,4 +233,13 @@ font-size: 12px;
   margin-top: -10px;
   border-radius: 10px;
   font-weight: bold;
+}
+.gift_item input{
+    margin:  0 10px;
+}
+.gift_item img{
+    margin: 5px 0;
+}
+.gift_item pre{
+    margin: 17px 20px;
 }

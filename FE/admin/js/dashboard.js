@@ -120,9 +120,9 @@ function displayProducts(products) {
         // Tạo phần tử sản phẩm
         const productElement = `
             <div class="sp-product">
-                <img src="${product.productImage[0] || '../img/default.png'}" alt="${product.productName}">
+                <img src="${product.productImage[0] || '../img/default.png'}" alt="${product.productName}" onclick="detail_product('${product._id}')">
                 <div class="name-product">
-                    <strong>${product.productName}</strong>
+                    <strong onclick="detail_product('${product._id}')" >${product.productName}</strong>
                     <p class="color-options">+${product.availableColors.length} màu sắc</p>
                 </div>
                 <div class="price-product">
@@ -135,8 +135,8 @@ function displayProducts(products) {
                     </div>
                 </div>
                 <div class="cart-product">
-                    <img src="../img/giohang.png" class="cart-icon" alt="Thêm vào giỏ hàng">
-                    <p class="cart-text">Thêm vào giỏ hàng</p>
+                    <img src="../img/giohang.png" class="cart-icon" alt="Thêm vào giỏ hàng" onclick = "add_to_cart('${product._id}')">
+                    <p class="cart-text" onclick = "add_to_cart('${product._id}')">Thêm vào giỏ hàng</p>
                 </div>
             </div>
         `;
@@ -255,28 +255,48 @@ function sign_out() {
     deleteAllCookies(); // Xóa tất cả cookies
     window.location.href = "home.html"; // Chuyển hướng về trang chủ hoặc trang đăng nhập
 }
-function detail_product(){
-    const myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-
-const raw = JSON.stringify({
-  "productId": "672e3dec9c496002edcb84ce"
-});
-
-const requestOptions = {
-  method: "POST",
-  headers: myHeaders,
-  body: raw,
-  redirect: "follow"
-};
-
-fetch("http://localhost:8080/api/product-details", requestOptions)
-  .then((response) => response.text())
-  .then((result) => console.log(result))
-  .catch((error) => console.error(error));
+function detail_product(productId){
+    console.log(productId);
+    document.cookie = `productId=${productId}; path=/; max-age=${7 * 24 * 60 * 60};`;
+    location.href = "detail.html";
 }
 
+function add_to_cart(productId) {
+    // Lấy token trực tiếp từ cookie 'token'
+    console.log(productId);
+    
+    const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
 
+    console.log('Token from cookie:', token);
+
+    if (!token) {
+        alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+        return;
+    }
+
+    fetch("http://localhost:8080/api/addtocart", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,  // Gửi token trong Authorization header
+        },
+        body: JSON.stringify({
+            productId: productId,
+            quantity: 1,
+        }),
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok " + response.statusText);
+        }
+        return response.json();
+    })
+    .then((result) => console.log("Add to Cart Response:", result))
+    .catch((error) => console.error("Add to Cart Error:", error));
+}
 
 // Call the getProducts function when the page loads
 window.onload = getProducts;

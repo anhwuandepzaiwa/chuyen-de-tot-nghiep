@@ -121,7 +121,7 @@ function showForgotPasswordPanel() {
                         document.cookie = `token=${token}; path=/; max-age=${7 * 24 * 60 * 60};`; // Token sẽ hết hạn sau 7 ngày
                         document.cookie = `name=${name}; path=/; max-age=${7 * 24 * 60 * 60};`; // Lưu tên người dùng vào cookie
                         alert("Đăng nhập thành công");
-                        window.location.href = "/chuyen-de-tot-nghiep/FE/layout/home.html"; // Chuyển trang nếu email đã được xác thực
+                        location.href = "home.html"; // Chuyển trang nếu email đã được xác thực
                     }
                 } else {
                     alert('Đăng nhập thất bại: ' + result.message);
