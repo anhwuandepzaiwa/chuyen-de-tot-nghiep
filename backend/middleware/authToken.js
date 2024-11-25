@@ -1,49 +1,72 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/userModel');
 
-// Middleware for authentication
 async function authToken(req, res, next) {
     try {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
         if (!token)
-            return res.status(403).json({ error: "Please provide a token" })
+            return res.status(403).json({
+                message: "Token chưa được cung cấp",
+                success: false
+            });
 
         jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, decoded) => {
             if (err) {
                 return res.status(403).json({
-                    message: "Unauthorized access",
-                    error: true,
-                    success: false,
+                    message: "Truy cập bị từ chối",
+                    success: false
                 });
             }
 
             req.userId = decoded?._id;
             req.userRole = decoded?.role;
 
-            next(); // Move to the next middleware or route
+            next(); 
         });
     } catch (err) {
         res.status(400).json({
-            message: err.message || "An error occurred",
-            error: true,
+            message: err.message || "Lỗi không xác định",
             success: false,
         });
     }
 }
 
-// Middleware for admin access
+async function checkPermission (req, res, next) {
+    try
+    {
+        if (req.userRole === 'ADMIN') {
+            next();
+        }
+        if (req.userRole === 'EMPLOYEE') {
+            const user = await User.findById(req.userId).populate('permissions');
+            const hasPermission = user.permissions.some((perm) => perm.name === requiredPermission);
+
+            if (!hasPermission) {
+                return res.status(403).json({ message: 'Permission denied' });
+            }
+            return next();
+        }
+        return res.status(403).json({ message: 'Permission denied' });
+    } 
+    catch (error) 
+    {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 async function isAdmin(req, res, next) {
     if (req.userRole !== 'ADMIN') {
         return res.status(403).json({
-            message: "Access denied: admin only",
-            error: true,
+            message: "Truy cập bị từ chối, chỉ có quyền ADMIN mới được phép",
             success: false,
         });
     }
-    next(); // Continue if admin
+    next(); 
 }
 
 module.exports = {
     authToken,
+    checkPermission,
     isAdmin
 };

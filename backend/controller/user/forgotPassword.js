@@ -1,5 +1,5 @@
 const userModel = require("../../models/userModel");
-const crypto = require("crypto"); // For generating OTP
+const crypto = require("crypto"); 
 const sendMail = require("../../helpers/send.mail");
 require("dotenv").config();
 
@@ -11,7 +11,7 @@ async function forgotPassword(req, res) {
         const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(404).json({
-                message: "Email not found.",
+                message: "Email không tồn tại.",
                 success: false
             });
         }
@@ -40,13 +40,13 @@ async function forgotPassword(req, res) {
         });
 
         res.status(200).json({
-            message: "OTP sent successfully. Please check your email.",
+            message: "OTP đã được gửi thành công qua email.",
             success: true
         });
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: err.message || "An error occurred while sending OTP.",
+            message: err.message || "Lỗi không xác định",
             success: false
         });
     }

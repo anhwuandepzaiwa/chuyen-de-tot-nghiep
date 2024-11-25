@@ -9,13 +9,13 @@ const searchProduct = async (req, res) => {
         // Kiểm tra nếu không có từ khóa tìm kiếm
         if (!query) {
             return res.status(400).json({
-                message: "Search query cannot be empty",
+                message: "Vui lòng nhập từ khóa tìm kiếm",
                 error: true,
                 success: false
             });
         }
 
-        const regex = new RegExp(query, 'i'); // Không cần cờ 'g' vì không có lợi trong tìm kiếm
+        const regex = new RegExp(query, 'i'); 
 
         const products = await productModel.find({
             "$or": [
@@ -24,14 +24,12 @@ const searchProduct = async (req, res) => {
                 { subcategory: regex }
             ]
         })
-        .skip((page - 1) * limit) // Bỏ qua các kết quả của trang trước
-        .limit(limit); // Giới hạn số lượng kết quả trả về
+        .skip((page - 1) * limit) 
+        .limit(limit); 
 
-        // Kiểm tra nếu không tìm thấy sản phẩm nào
         if (products.length === 0) {
             return res.status(404).json({
-                message: "No products found",
-                error: false,
+                message: "Không tìm thấy sản phẩm nào",
                 success: true,
                 data: []
             });
@@ -39,14 +37,12 @@ const searchProduct = async (req, res) => {
 
         res.status(200).json({
             data: products,
-            message: "Search Product list",
-            error: false,
+            message: "Tìm kiếm sản phẩm thành công",
             success: true
         });
     } catch (err) {
         res.status(500).json({
-            message: err.message || "Internal Server Error",
-            error: true,
+            message: err.message || "Lỗi khi tìm kiếm sản phẩm",
             success: false
         });
     }

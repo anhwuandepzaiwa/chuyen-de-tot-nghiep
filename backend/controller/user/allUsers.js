@@ -1,47 +1,38 @@
 const userModel = require("../../models/userModel");
-const mongoose = require('mongoose');
 
 async function allUsers(req, res) 
 {
     try {
-        console.log("User ID from request:", req.userId);
-
-        // Kiểm tra vai trò người dùng
         const user = await userModel.findById(req.userId);
-        if (!user || user.role !== 'ADMIN') 
+        if (user.role !== 'ADMIN') 
         {
             return res.status(403).json({
-                message: "Access denied",
-                error: true,
+                message: "Tài khoản của bạn không có quyền truy cập",
                 success: false,
             });
         }
 
-        // Lấy các tham số truy vấn cho phân trang
-        const page = parseInt(req.query.page) || 1; // Mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 10; // Mặc định là 10 người dùng trên mỗi trang
-
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10; 
         const users = await userModel.find()
-            .skip((page - 1) * limit) // Bỏ qua số lượng người dùng đã được lấy
-            .limit(limit); // Giới hạn số người dùng được trả về
+            .skip((page - 1) * limit) 
+            .limit(limit); 
 
-        const totalUsers = await userModel.countDocuments(); // Đếm tổng số người dùng
+        const totalUsers = await userModel.countDocuments(); 
 
         res.json({
-            message: "All Users",
+            message: "Danh sách người dùng",
             data: users,
             total: totalUsers,
             currentPage: page,
             totalPages: Math.ceil(totalUsers / limit),
             success: true,
-            error: false,
         });
     } 
     catch (err) 
     {
         res.status(400).json({
-            message: err.message || "An error occurred",
-            error: true,
+            message: err.message || "Đã xảy ra lỗi khi tải danh sách người dùng",
             success: false,
         });
     }

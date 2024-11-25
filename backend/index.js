@@ -5,15 +5,19 @@ require('dotenv').config()
 const connectDB = require('./config/db')
 const router = require('./routes')
 const passport = require("passport");
+const bodyParser = require('body-parser');
+const permissionRouters = require('./routes/permissionRoutes');
 
 const app = express()
+app.use(bodyParser.json());
 app.use(cors({
-    origin : "http://127.0.0.1:5500",
+    origin : process.env.FRONTEND_URL,
     credentials : true
 }))
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+
 app.use(cookieParser())
 /*app.use(
 	cookieSession({
@@ -26,6 +30,8 @@ app.use(passport.initialize());
 //app.use(passport.session());
 
 app.use("/api",router)
+app.use('/api/permission', permissionRouters);
+
 
 const PORT = 8080 || process.env.PORT
 

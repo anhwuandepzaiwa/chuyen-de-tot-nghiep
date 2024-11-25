@@ -2,13 +2,15 @@ const Promotion = require('../../models/promotionSchema');
 
 const getAllPromotions = async (req, res) => {
     try {
-        // Lấy tất cả mã khuyến mại
         const promotions = await Promotion.find();
 
-        res.json({ success: true, promotions });
+        res.json({ 
+            success: true, 
+            promotions });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Failed to retrieve promotions' });
+        res.status(400).json({ 
+            success: false,
+            message: error.message || 'Lỗi không lấy được mã giảm giá' });
     }
 };
 

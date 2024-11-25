@@ -10,17 +10,14 @@ const orderSchema = new mongoose.Schema({
         type : String,
         default : ""
     },
-    userId : {
-        type : String,
-        default : ""
-    },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
     paymentDetails : {
         paymentId : {
             type : String,
             default : ""
         },
         payment_method_type : [],
-        payment_status : {
+        payment_status : {  
             type : String,
             default : ""
         }

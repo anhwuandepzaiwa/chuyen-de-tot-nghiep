@@ -9,7 +9,7 @@ async function resetPassword(req, res) {
         const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(404).json({
-                message: "Email not found.",
+                message: "Nguời dùng không tồn tại.",
                 success: false
             });
         }
@@ -17,14 +17,14 @@ async function resetPassword(req, res) {
         // Kiểm tra OTP có hợp lệ không và thời gian hết hạn
         if (user.otp.toString() != otp.toString()) {
             return res.status(400).json({
-                message: "Invalid OTP.",
+                message: "Mã OTP không hợp lệ.",
                 success: false
             });
         }
 
         if (user.otpExpiresAt < Date.now()) {
             return res.status(400).json({
-                message: "OTP has expired.",
+                message: "Mã OTP đã hết hạn.",
                 success: false
             });
         }
@@ -32,7 +32,7 @@ async function resetPassword(req, res) {
         // Kiểm tra xem mật khẩu mới và xác nhận mật khẩu có khớp không
         if (newPassword !== confirmPassword) {
             return res.status(400).json({
-                message: "Passwords do not match.",
+                message: "Mật khẩu mới và xác nhận mật khẩu không khớp.",
                 success: false
             });
         }
@@ -49,13 +49,13 @@ async function resetPassword(req, res) {
         await user.save();
 
         res.status(200).json({
-            message: "Password updated successfully.",
+            message: "Mât khẩu đã được cập nhật thành công.",
             success: true
         });
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: err.message || "An error occurred while resetting the password.",
+            message: err.message || "Lỗi không xác định",
             success: false
         });
     }

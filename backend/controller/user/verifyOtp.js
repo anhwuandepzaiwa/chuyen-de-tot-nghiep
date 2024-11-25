@@ -7,7 +7,7 @@ async function verifyOtpController(req, res) {
 
         if (!email || !otp) {
             return res.status(400).json({
-                message: "Email and OTP are required.",
+                message: "Email và mã OTP không được để trống.",
                 success: false
             });
         }
@@ -15,34 +15,25 @@ async function verifyOtpController(req, res) {
         const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(404).json({
-                message: "User not found.",
+                message: "Người dùng không tồn tại.",
                 success: false
             });
         }
 
-        // Debugging logs
-        console.log("Stored OTP:", user.otp);
-        console.log("Entered OTP:", otp);
-        console.log("Expiration Time:", user.otpExpiresAt);
-        console.log("Current Time:", new Date());
-
-        // Check if OTP matches
         if (user.otp.toString() !== otp.toString()) {
             return res.status(400).json({
-                message: "Invalid OTP.",
+                message: "Mã OTP không hợp lệ.",
                 success: false
             });
         }
 
-        // Check if OTP has expired
         if (user.otpExpiresAt < new Date()) {
             return res.status(400).json({
-                message: "OTP has expired.",
+                message: "Mã OTP đã hết hạn.",
                 success: false
             });
         }
 
-        // Update confirmation and clear OTP
         user.isConfirmed = true;
         user.otp = null;
         user.otpExpiresAt = null;
@@ -51,12 +42,12 @@ async function verifyOtpController(req, res) {
         await user.save();
 
         res.status(200).json({
-            message: "Account verified successfully!",
+            message: "Tài khoản đã được xác thực thành công.",
             success: true
         });
     } catch (err) {
         res.status(500).json({
-            message: err.message || "An error occurred.",
+            message: err.message || "Lỗi không xác định",
             success: false
         });
     }

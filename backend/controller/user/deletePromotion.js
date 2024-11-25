@@ -4,17 +4,16 @@ const deletePromotion = async (req, res) => {
     try {
         const { promotionId } = req.params;
 
-        // Tìm và xóa mã khuyến mại theo ID
         const deletedPromotion = await Promotion.findByIdAndDelete(promotionId);
 
         if (!deletedPromotion) {
-            return res.status(404).json({ success: false, message: 'Promotion not found' });
+            return res.status(404).json({ success: false, message: 'Mã giảm giá không được tìm thấy' });
         }
 
-        res.json({ success: true, message: 'Promotion deleted successfully' });
+        res.json({ success: true, message: 'Mã giảm giá đã được xóa thành công' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Failed to delete promotion' });
+        res.status(500).json({ success: false, message: error.message || 'Lỗi xóa mã giảm giá' });
     }
 };
 

@@ -4,22 +4,11 @@ const Promotion = require('../../models/promotionSchema');
 
 const updatePromotion = async (req, res) => {
     try {
-        const { 
-            promotionId, 
-            code, 
-            discountType, 
-            discountValue, 
-            minOrderValue, 
-            startDate, 
-            endDate, 
-            usageLimit, 
-            isActive 
-        } = req.body;
+        const { promotionId, code, discountType, discountValue, minOrderValue, startDate, endDate, usageLimit, isActive } = req.body;
 
-        // Kiểm tra xem mã khuyến mại có tồn tại hay không
         const promotion = await Promotion.findById(promotionId);
         if (!promotion) {
-            return res.status(404).json({ success: false, message: 'Promotion not found' });
+            return res.status(404).json({ success: false, message: 'Mã khuyến mại không được tìm thấy' });
         }
 
         // Cập nhật thông tin khuyến mại
@@ -32,13 +21,11 @@ const updatePromotion = async (req, res) => {
         promotion.usageLimit = usageLimit !== undefined ? usageLimit : promotion.usageLimit;
         promotion.isActive = isActive !== undefined ? isActive : promotion.isActive;
 
-        // Lưu khuyến mại đã cập nhật
         await promotion.save();
 
-        res.json({ success: true, message: 'Promotion updated successfully', promotion });
+        res.json({ success: true, message: 'Mã khuyến mại đã được cập nhật thành công', promotion });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Failed to update promotion' });
+        res.status(500).json({ success: false, message: error.message || 'Lỗi cập nhật mã giảm giá' });
     }
 };
 

@@ -2,28 +2,16 @@ const userModel = require("../../models/userModel");
 
 async function deleteUser(req, res) {
     try {
-        const userId = req.userId; // Get user ID from the token
-        
-        const deletedUser = await userModel.findByIdAndDelete(userId);
-
-        if (!deletedUser) {
-            return res.status(404).json({
-                message: "User not found",
-                error: true,
-                success: false,
-            });
-        }
+        const deletedUser = await userModel.findByIdAndDelete(req.userId);
 
         res.json({
-            message: "Account deleted successfully",
-            success: true,
-            error: false
+            message: "Tài khoản "+ deletedUser.email + " đã được xóa thành công",
+            success: true
         });
     } catch (err) {
-        res.status(400).json({
-            message: err.message || "An error occurred",
-            error: true,
-            success: false,
+        res.status(400).json({  
+            message: err.message || "Đã xảy ra lỗi khi xóa tài khoản",
+            success: false
         });
     }
 }

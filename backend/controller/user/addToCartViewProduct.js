@@ -4,10 +4,9 @@ const productModel = require("../../models/productModel");
 
 const addToCartViewProduct = async (req, res) => {
     try {
-        const currentUser = req.userId;
 
         // Tìm tất cả sản phẩm trong giỏ hàng của người dùng hiện tại và lấy thông tin chi tiết sản phẩm
-        const cartItems = await addToCartModel.find({ userId: currentUser })
+        const cartItems = await addToCartModel.find({ userId: req.userId })
             .populate({
                 path: "productId",
                 model: productModel,
@@ -27,6 +26,13 @@ const addToCartViewProduct = async (req, res) => {
             totalAmount += totalPrice; // Cộng dồn vào tổng tiền giỏ hàng
             totalQuantity += item.quantity; // Cộng dồn số lượng sản phẩm vào tổng số lượng
 
+            // Lấy thông tin phần quà đã chọn (nếu có)
+            const selectedGift = item.selectedGift;
+            const giftDetails = selectedGift ? {
+                giftName: selectedGift, // Tên quà tặng
+                giftImage: product.giftItems.find(gift => gift === selectedGift), // Lấy hình ảnh của quà tặng nếu có
+            } : null;
+
             return {
                 productId: product._id, // Thêm id của sản phẩm
                 productName: product.productName,
@@ -37,7 +43,7 @@ const addToCartViewProduct = async (req, res) => {
                 discountPercentage: product.discountPercentage || 0,
                 quantity: item.quantity,
                 totalPrice: totalPrice,
-                giftItems: product.giftItems.length > 0 ? product.giftItems : null,
+                giftItems: giftDetails, // Thêm thông tin quà tặng vào giỏ hàng
             };
         }).filter(item => item !== null); // Lọc ra các sản phẩm null (nếu có)
 

@@ -1,14 +1,21 @@
 const productModel = require("../../models/productModel");
+const mongoose = require("mongoose");
 
 const getProductDetails = async (req, res) => {
     try {
-        const { productId } = req.query; // Lấy từ req.query
+        const { productId } = req.body;
 
         if (!productId) {
             return res.status(400).json({
-                message: "Product ID is required",
-                error: true,
+                message: "Chưa cung cấp ID sản phẩm",
                 success: false
+            });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({
+                message: "ID sản phẩm không hợp lệ",
+                success: false,
             });
         }
 
@@ -16,8 +23,7 @@ const getProductDetails = async (req, res) => {
 
         if (!product) {
             return res.status(404).json({
-                message: "Product not found",
-                error: false,
+                message: "Sản phẩm không tồn tại",
                 success: true,
                 data: null
             });
@@ -25,19 +31,16 @@ const getProductDetails = async (req, res) => {
 
         res.status(200).json({
             data: product,
-            message: "Product details fetched successfully",
+            message: "Chi tiết sản phẩm đã được tải thành công",
             success: true,
-            error: false
         });
 
     } catch (err) {
         res.status(500).json({
-            message: err?.message || "Internal Server Error",
-            error: true,
+            message: err?.message || "Lỗi khi tải chi tiết sản phẩm",
             success: false
         });
     }
 };
 
 module.exports = getProductDetails;
-

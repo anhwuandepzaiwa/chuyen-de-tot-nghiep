@@ -7,8 +7,8 @@ const userSignUpController = require("../controller/user/userSignUp")
 const userSignInController = require('../controller/user/userSignIn')
 const userDetailsController = require('../controller/user/userDetails')
 const { authToken, isAdmin } = require('../middleware/authToken');
-//const signUpLimiter = require('../middleware/rateLimit')
-const checkEmailConfirm = require('../middleware/checkEmailConfirm')
+const signUpLimiter = require('../middleware/rateLimit')
+//const checkEmailConfirm = require('../middleware/checkEmailConfirm')
 const userLogout = require('../controller/user/userLogout')
 const allUsers = require('../controller/user/allUsers')
 const updateUser = require('../controller/user/updateUser')
@@ -28,12 +28,11 @@ const updateAddToCartProduct = require('../controller/user/updateAddToCartProduc
 const searchProduct = require('../controller/product/searchProduct')
 const deleteProduct = require('../controller/product/deleteProduct')
 const filterProductController = require('../controller/product/filterProduct')
-const paymentController = require('../controller/order/paymentController')
 const webhooks = require('../controller/order/webhook')
 const orderController = require('../controller/order/order.controller')
 const allOrderController = require('../controller/order/allOrder.controller')
-const paymentZalo = require('../controller/order/paymentzalo');
-const callbackZalo = require('../controller/order/callbackZalo');
+const paymentController = require('../controller/order/paymentController');
+const statusController = require('../controller/order/statusController');
 const confirmEmailController = require('../controller/user/emailAuthentication')
 const verifyOtpController = require('../controller/user/verifyOtp')
 const refreshConfirmationData = require('../controller/user/refreshConfirmationData')
@@ -43,31 +42,58 @@ const createPromotion = require('../controller/user/createPromotion');
 const updatePromotion = require('../controller/user/updatePromotion');
 const deletePromotion = require('../controller/user/deletePromotion');
 const getAllPromotions = require('../controller/user/getAllPromotions');
+const adminController = require('../controller/adminController');
+const reviewController = require('../controller/reviewController');
+const wishlistController = require('../controller/wishlistController');
+const { createPayment, handleCallback, checkTransactionStatus } = require('../controller/order/momoController');
 
+router.post("/check-status-order-zalo", statusController.checkOrderStatus);
+router.post("/paymentZalo", paymentController.createOrder);
+router.post("/callbackZalo", paymentController.handleCallback);
+router.post("/paymentMomo", createPayment);
+router.post("/callbackMomo", handleCallback);
+router.post("/check-transaction-status-momo", checkTransactionStatus);
+
+// auth
+router.post("/signup", signUpLimiter, userSignUpController);
+router.post("/signin", userSignInController);
 router.post("/forgot-password", forgotPasswordController);
 router.post("/reset-password", resetPassword);
 router.post("/verify-otp", verifyOtpController);
 router.post('/refresh-confirmation', refreshConfirmationData);
-router.post("/signup",userSignUpController);
-router.post("/signin", checkEmailConfirm, userSignInController);
-router.get('/user-details', userDetailsController);
+
+// user
+router.get('/user-details', authToken, userDetailsController);
+router.put("/user-update", authToken, updateUser);
+router.delete("/delete-account", authToken, deleteUser);
+router.get('/all-promotions', getAllPromotions);
 router.get("/userLogout",userLogout);
 router.get("/confirm-email",confirmEmailController);
-router.put("/user-update", authToken, updateUser);
+
+
+router.post('/reviews/', authToken, reviewController.createReview);
+router.put('/reviews/:id', authToken, reviewController.updateReview);
+router.delete('/reviews/:id', authToken, reviewController.deleteReview);
+router.get('/reviews/product/:productId', reviewController.getReviewsByProduct);
+router.get('/reviews/user/', authToken, reviewController.getReviewsByUser);
+router.post('/wishlist/add', authToken, wishlistController.addToWishlist);
+router.get('/wishlist/', authToken, wishlistController.getWishlist);
+router.delete('/wishlist/remove', authToken, wishlistController.removeFromWishlist);
+
+
 
 //admin panel 
-router.get("/all-user",authToken,allUsers)
-router.post("/update-user",authToken,updateUser)
+router.get("/all-user",authToken, isAdmin, allUsers)
 router.delete("/delete-user", authToken, isAdmin, deleteAdminUser)
-router.delete("/delete-account", authToken, deleteUser);
 router.post('/create-promotion', authToken, isAdmin, createPromotion);
 router.put('/update-promotion', authToken, isAdmin, updatePromotion);
 router.delete('/delete-promotion/:promotionId', authToken, isAdmin, deletePromotion);
-router.get('/all-promotions', authToken, isAdmin, getAllPromotions);
+router.put('/update-role', authToken, isAdmin, adminController.upgradeToEmployee);
+router.post('/assign-permissions', authToken, isAdmin, adminController.assignPermissions);
 
 //product
 router.post("/upload-product", authToken, isAdmin, upload.array('productImage', 6), UploadProductController)
-router.get("/get-product",getProductController)
+router.get("/get-product", authToken, isAdmin, getProductController)
 router.post("/update-product",authToken, isAdmin ,upload.array('productImage', 6),updateProductController)
 router.get("/getProductFromUser",getProductFromUser)
 router.post("/category-product",getCategoryWiseProduct)
@@ -84,12 +110,12 @@ router.post("/update-cart-product",authToken,updateAddToCartProduct)
 router.delete("/delete-cart-product", authToken, deleteProductFromCart);
 
 //payment and order
-router.post('/checkout',authToken,paymentController)
+//router.post('/checkout',authToken,paymentController)
 router.post('/webhook',webhooks) // /api/webhook
 router.get("/order-list",authToken,orderController)
 router.get("/all-order",authToken,allOrderController)
-router.post('/paymentZalo',authToken,paymentZalo)
-router.post('/callbackZalo',callbackZalo)
+//router.post('/paymentZalo',authToken,paymentZalo)
+//router.post('/callbackZalo',callbackZalo)
 
 
 module.exports = router

@@ -1,43 +1,38 @@
 const userModel = require("../../models/userModel");
-const mongoose = require('mongoose');
 
 async function userDetailsController(req, res) {
     try {
-        const userId = req.query.userId; // Get userId from query parameters
-        console.log("Incoming userId:", userId);
-
-        // Validate ObjectId format
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                message: "Invalid user ID format",
-                error: true,
-                success: false,
-            });
-        }
-
-        const user = await userModel.findById(userId);
+        const user = await userModel.findById(req.userId);
         if (!user) {
             return res.status(404).json({
-                message: "User not found",
-                error: true,
+                message: "Không tìm thấy người dùng",
                 success: false,
             });
         }
 
-        // Optionally exclude sensitive data like password
-        const { password, ...safeUserData } = user._doc;
+        if(!user.phone){
+            user.phone = "";
+        }
+
+        if(!user.address){
+            user.address = "";
+        }
 
         res.status(200).json({
-            data: safeUserData,
-            error: false,
+            data: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                address: user.address,
+                role: user.role
+            },
             success: true,
-            message: "User details fetched successfully",
+            message: "Thông tin người dùng đã được tải thành công",
         });
     } catch (err) {
-        console.error(err); // Log the error for debugging
         res.status(400).json({
-            message: err.message || "An error occurred",
-            error: true,
+            message: err.message || "Đã xảy ra lỗi khi tải thông tin người dùng",
             success: false,
         });
     }

@@ -2,37 +2,32 @@ const userModel = require("../../models/userModel");
 
 async function updateUser(req, res) {
     try {
-        const sessionUser = req.userId; // ID của người dùng hiện tại từ token
-        const { name, phone, address } = req.body; // Chỉ lấy các trường cần thiết
+        const { name, phone, address } = req.body; 
 
-        // Tạo payload chỉ với các trường có thể cập nhật
         const payload = {
             ...(name && { name }),
-            ...(phone && { phone }), // Giả sử có trường 'phone' trong model
-            ...(address && { address }), // Giả sử có trường 'address' trong model
+            ...(phone && { phone }), 
+            ...(address && { address })
         };
 
         // Cập nhật thông tin người dùng
-        const updatedUser = await userModel.findByIdAndUpdate(sessionUser, payload, { new: true }); // 'new: true' để trả về tài liệu đã cập nhật
-
-        if (!updatedUser) {
-            return res.status(404).json({
-                message: "User not found",
-                error: true,
-                success: false,
-            });
-        }
+        const updatedUser = await userModel.findByIdAndUpdate(req.userId, payload, { new: true }); // 'new: true' để trả về tài liệu đã cập nhật
 
         res.json({
-            data: updatedUser,
-            message: "User information updated successfully",
-            success: true,
-            error: false,
+            data: {
+                id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                phone: updatedUser.phone,
+                address: updatedUser.address,
+                role: updatedUser.role
+            },
+            message: "Thông tin người dùng đã được cập nhật thành công",
+            success: true
         });
     } catch (err) {
         res.status(400).json({
-            message: err.message || "An error occurred",
-            error: true,
+            message: err.message || "Đã xảy ra lỗi khi cập nhật thông tin người dùng",
             success: false,
         });
     }

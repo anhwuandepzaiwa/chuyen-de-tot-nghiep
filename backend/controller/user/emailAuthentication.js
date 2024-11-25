@@ -8,7 +8,7 @@ async function confirmEmailController(req, res) {
 
         if (!token) {
             return res.status(400).json({
-                message: "No token provided.",
+                message: "Không tìm thấy token trong yêu cầu.",
                 success: false
             });
         }
@@ -16,9 +16,9 @@ async function confirmEmailController(req, res) {
         // Verify the token
         jwt.verify(token, process.env.TOKEN_SECRET_KEY, async (err, decoded) => {
             if (err) {
-                console.error("Token verification failed:", err.message);
+                console.error("Xác nhận token thất bại", err.message);
                 return res.status(400).json({
-                    message: "Invalid or expired confirmation link.",
+                    message: "Liên kết xác nhận không hợp lệ hoặc đã hết hạn.",
                     success: false
                 });
             }
@@ -26,14 +26,14 @@ async function confirmEmailController(req, res) {
             const user = await userModel.findById(decoded.id);
             if (!user) {
                 return res.status(404).json({
-                    message: "User not found.",
+                    message: "Người dùng không tồn tại.",
                     success: false
                 });
             }
 
             if (user.isConfirmed) {
                 return res.status(400).json({
-                    message: "Email is already confirmed.",
+                    message: "Email đã được xác nhận trước đó.",
                     success: false
                 });
             }
@@ -45,14 +45,13 @@ async function confirmEmailController(req, res) {
             await user.save();
 
             res.status(200).json({
-                message: "Email confirmed successfully!",
+                message: "Email đã được xác nhận thành công.",
                 success: true
             });
         });
     } catch (err) {
-        console.error("An error occurred during email confirmation:", err.message);
         res.status(500).json({
-            message: "An error occurred during email confirmation.",
+            message: "Lỗi khi xác nhận email: " + err.message,
             success: false
         });
     }

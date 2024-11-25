@@ -1,63 +1,90 @@
 const addToCartModel = require("../../models/cartProduct");
-const productModel = require("../../models/productModel"); // Import the product model
+const productModel = require("../../models/productModel");
+const mongoose = require("mongoose");
 
 const addToCartController = async (req, res) => {
     try {
-        const { productId, quantity } = req.body; // Get both productId and quantity from the request body
-        const currentUser = req.userId;
+        // Lấy dữ liệu từ body request
+        const { productId, quantity, selectedColor, selectedGift } = req.body;
 
-        // Find the product to check the stock
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({
+                message: "ID sản phẩm không hợp lệ",
+                success: false,
+            });
+        }
+
         const product = await productModel.findById(productId);
 
         if (!product) {
             return res.status(404).json({
-                message: "Product not found",
+                message: "Sản phẩm không tồn tại",
+                success: false,
+            });
+        }
+
+        // Kiểm tra màu sắc hợp lệ
+        if (selectedColor && !product.availableColors.includes(selectedColor)) {
+            return res.status(400).json({
+                message: "Màu sắc đã chọn không hợp lệ",
                 success: false,
                 error: true
             });
         }
 
-        // Check if the requested quantity is greater than the available stock
+        // Kiểm tra quà tặng hợp lệ
+        if (selectedGift && !product.giftItems.includes(selectedGift)) {
+            return res.status(400).json({
+                message: "Quà tặng đã chọn không hợp lệ",
+                success: false,
+            });
+        }
+
+        // Kiểm tra tồn kho
         if (quantity > product.stock) {
             return res.status(400).json({
-                message: `Only ${product.stock} items available in stock`,
+                message: `Chỉ còn ${product.stock} sản phẩm trong kho`,
                 success: false,
-                error: true
             });
         }
 
-        // Check if the product is already in the cart
-        const isProductAvailable = await addToCartModel.findOne({ productId, userId: currentUser });
+        // Kiểm tra sản phẩm đã tồn tại trong giỏ hàng
+        const isProductAvailable = await addToCartModel.findOne({
+            productId,
+            userId: req.userId,
+            selectedColor,
+            selectedGift
+        });
 
         if (isProductAvailable) {
-            // Update the quantity if product already exists in the cart
+            // Cập nhật số lượng
             const updatedQuantity = isProductAvailable.quantity + quantity;
 
-            // Check if the updated quantity exceeds available stock
+            // Kiểm tra số lượng vượt quá tồn kho
             if (updatedQuantity > product.stock) {
                 return res.status(400).json({
-                    message: `You can only add up to ${product.stock - isProductAvailable.quantity} more items`,
+                    message: `Bạn chỉ có thể thêm tối đa ${product.stock - isProductAvailable.quantity} sản phẩm nữa`,
                     success: false,
-                    error: true
                 });
             }
 
+            // Cập nhật số lượng sản phẩm
             isProductAvailable.quantity = updatedQuantity;
             await isProductAvailable.save();
 
             return res.json({
                 data: isProductAvailable,
-                message: "Product quantity updated in cart",
+                message: "Đã cập nhật số lượng sản phẩm trong giỏ hàng",
                 success: true,
-                error: false
             });
         }
 
-        // If product is not in the cart, add it with the specified quantity
         const payload = {
-            productId: productId,
-            quantity: quantity || 1, // Default to 1 if quantity is not provided
-            userId: currentUser,
+            productId,
+            quantity: quantity || 1, 
+            userId: req.userId,
+            selectedColor,
+            selectedGift
         };
 
         const newAddToCart = new addToCartModel(payload);
@@ -65,18 +92,16 @@ const addToCartController = async (req, res) => {
 
         return res.json({
             data: saveProduct,
-            message: "Product added to cart",
+            message: "Sản phẩm đã được thêm vào giỏ hàng",
             success: true,
-            error: false
         });
 
     } catch (err) {
-        res.json({
+        return res.status(500).json({
             message: err?.message || err,
-            error: true,
-            success: false
+            success: false,
         });
     }
-}
+};
 
 module.exports = addToCartController;

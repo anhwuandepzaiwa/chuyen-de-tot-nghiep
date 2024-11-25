@@ -1,49 +1,43 @@
 const userModel = require("../../models/userModel");
-const crypto = require("crypto"); // For generating OTP
+const crypto = require("crypto"); 
 const jwt = require("jsonwebtoken");
 const sendMail = require("../../helpers/send.mail");
 require("dotenv").config();
 
 async function refreshConfirmationData(req, res) {
     try {
-        const { email } = req.body; // Email is sent in request body
+        const { email } = req.body; 
 
-        // Find the user by email
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "User not found", success: false });
+            return res.status(404).json({ message: "Người dùng không được tìm thấy", success: false });
         }
 
-        // Check if the account is already confirmed
         if (user.isConfirmed) {
             return res.status(400).json({
-                message: "Your account is already confirmed.",
+                message: "Tài khoan đã được xác nhận. Không thể làm mới OTP hoặc liên kết xác nhận.",
                 success: false
             });
         }
 
-        // Check if the OTP or confirmation link has expired
         const otpExpired = user.otpExpiresAt < Date.now();
 
-        // Ensure the token exists before checking the expiration
         let linkExpired = false;
         if (user.token) {
             try {
                 linkExpired = !user.isConfirmed && jwt.verify(user.token, process.env.TOKEN_SECRET_KEY).exp < Date.now() / 1000;
             } catch (err) {
-                console.error('Error verifying token:', err);
-                linkExpired = true;  // If there's an error verifying the token, treat it as expired
+                linkExpired = true;  
             }
         }
 
         if (!otpExpired && !linkExpired) {
             return res.status(400).json({
-                message: "Both OTP and confirmation link are still valid.",
+                message: "Cả OTP và liên kết xác nhận đều còn hiệu lực. Không cần làm mới.",
                 success: false
             });
         }
 
-        // If OTP is expired, generate a new OTP and update the expiry time
         if (otpExpired) {
             const newOtp = crypto.randomInt(100000, 999999);
             const otpExpiryTime = 15 * 60 * 1000; // 15 minutes
@@ -51,7 +45,6 @@ async function refreshConfirmationData(req, res) {
             user.otpExpiresAt = new Date(Date.now() + otpExpiryTime);
         }
 
-        // If link is expired, generate a new token and update it
         if (linkExpired) {
             const newToken = jwt.sign({ id: user._id, email: user.email }, process.env.TOKEN_SECRET_KEY, { expiresIn: '24h' });
             user.token = newToken;
@@ -77,13 +70,13 @@ async function refreshConfirmationData(req, res) {
         });
 
         res.status(200).json({
-            message: "OTP or confirmation link refreshed successfully. Please check your email.",
+            message: "Mã OTP hoặc liên kết xác nhận đã được làm mới thành công.",
             success: true
         });
     } catch (err) {
         console.error(err);
         res.status(400).json({
-            message: err.message || "An error occurred while refreshing OTP or confirmation link.",
+            message: err.message || "Lỗi không xác định",
             success: false
         });
     }

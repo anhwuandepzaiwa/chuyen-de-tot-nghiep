@@ -8,21 +8,54 @@ async function userSignInController(req,res)
     try{
         const { email , password} = req.body
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
-            throw new Error("Please provide a valid email");
-        }
-        if (!password || password.length < 8) {
-            throw new Error("Password should be at least 8 characters long");
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if(!email) {
+            res.status(400).json({
+                message: "Vui lòng cung cấp email",
+                success: false
+            });
+        }else if (!emailRegex.test(email)) {
+            res.status(400).json({
+                message: "Email không hợp lệ. Vui lòng nhập đúng định dạng email.",
+                success: false
+            });
         }
 
-        const user = await userModel.findOne({email})
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if(!password) {
+            res.status(400).json({
+                message: "Vui lòng cung cấp mật khẩu",
+                success: false
+            });
+        }else if (!passwordRegex.test(password)) {
+            res.status(400).json({
+                message: "Mật khẩu phải bao gồm ít nhất 8 ký tự một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.",
+                success: false
+            });
+        }
 
-        if(!user)
-        {
-            throw new Error("User not found")
+        const user = await userModel.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({
+                message: "Không tìm thấy người dùng với email này",
+                success: false
+            });
         }
         
+        if(!password){
+            res.status(400).json({
+                message: "Vui lòng cung cấp mật khẩu",
+                success: false
+            });
+        }
+
+        if(!user.isConfirmed){
+            return res.status(403).json({
+                message: "Email chưa được xác nhận",
+                success: false
+            });
+        }
+
         const checkPassword = await bcrypt.compare(password,user.password)
 
         if(checkPassword)
@@ -33,17 +66,16 @@ async function userSignInController(req,res)
             role: user.role
         }
 
-        const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: 60 * 60 * 8 });
+        const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: '24h' });
 
-        const tokenOption = {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',  // Set to true only in production
-            sameSite: 'None'  // Required for cross-site requests
-        };
+        // const tokenOption = {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === 'production',  // Set to true only in production
+        //     sameSite: 'None'  // Required for cross-site requests
+        // };
         
-
-        res.cookie("token",token,tokenOption).status(200).json({
-            message : "Login successfully",
+        res.status(200).json({
+            message : "Đăng nhập thành công",
             data: {
                 token,  
                 name: user.name,  
@@ -51,18 +83,22 @@ async function userSignInController(req,res)
                 isConfirmed: user.isConfirmed
             },
             success : true,
-            error : false
         })
 
         }
         else
         {
-         throw new Error("Please check Password");
+            res.status(400).json({
+                message : "Mật khẩu không chính xác",
+                success : false
+            });
         }
     }
     catch(err)
     {
+        console.log(err)
         res.json({
+            
             message : err.message || err,
             error : true,
             success : false,

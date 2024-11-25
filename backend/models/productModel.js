@@ -55,6 +55,10 @@ const productSchema = new mongoose.Schema({
         type: [String], 
         default: [] 
     },
+    averageRating: {
+        type: Number,
+        default: 0, 
+    },
     description: { 
         introduction: { 
             type: String,  
