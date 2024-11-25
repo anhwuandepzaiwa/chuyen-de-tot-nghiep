@@ -46,7 +46,7 @@ async function getProducts() {
 
                 productElement.innerHTML = `
                     <div class="sp-product">
-                        <img src="${productImage}" alt="${productName}">
+                        <img src="${productImage}" alt="${productName}" style="width: 300px; height: 250px;">
                         <div class="name-product">
                             <strong>${productName}</strong>
                             <p class="color-options">+6 màu sắc</p>
@@ -119,8 +119,8 @@ function displayProducts(products) {
     products.forEach((product, index) => {
         // Tạo phần tử sản phẩm
         const productElement = `
-            <div class="sp-product">
-                <img src="${product.productImage[0] || '../img/default.png'}" alt="${product.productName}" onclick="detail_product('${product._id}')">
+            <div class="sp-product" style="cursor: pointer; width: 250px;">
+                <img src="${product.productImage[0] || '../img/default.png'}" alt="${product.productName}" onclick="detail_product('${product._id}')" style="width: 300px; height: 250px;">
                 <div class="name-product">
                     <strong onclick="detail_product('${product._id}')" >${product.productName}</strong>
                     <p class="color-options">+${product.availableColors.length} màu sắc</p>
@@ -136,7 +136,7 @@ function displayProducts(products) {
                 </div>
                 <div class="cart-product">
                     <img src="../img/giohang.png" class="cart-icon" alt="Thêm vào giỏ hàng" onclick = "add_to_cart('${product._id}')">
-                    <p class="cart-text" onclick = "add_to_cart('${product._id}')">Thêm vào giỏ hàng</p>
+                    <p class="cart-text" onclick = "add_to_cart('${product._id}')" style="cursor: pointer; font-size: 14px;">Thêm vào giỏ hàng</p>
                 </div>
             </div>
         `;

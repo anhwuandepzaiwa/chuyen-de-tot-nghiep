@@ -81,10 +81,8 @@ body{
 }
 
 .new-product {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Sử dụng 5 cột đều */
-    gap: 20px;
-    padding-top: 20px; /* Giảm padding-top */
+    display: flex;
+    padding-top: 15px; /* Giảm padding-top */
     margin: 0; /* Đảm bảo không có margin thừa */
     padding-right: 0; /* Bỏ padding-right thừa */
     width: 100%; /* Đảm bảo chiều rộng chiếm hết không gian */
@@ -110,7 +108,7 @@ body{
     border: 1px solid #ddd; 
     border-radius: 8px; 
     padding: 70px; 
-    width: 280px;
+    width: 250px;
     height: 550px;
     transition: transform 0.3s; 
    
@@ -211,7 +209,7 @@ body{
 .cart-product p{
     font-weight: bold;
     padding-left: 10px;
-    font-size: 18px;
+    font-size: 16px;
 }
 .cart-icon {
     width: 24px; 
@@ -237,7 +235,7 @@ body{
 }
 
 .cart-text {
-    margin: 0; 
+    margin: 0;
     font-size: 16px;
 }
 

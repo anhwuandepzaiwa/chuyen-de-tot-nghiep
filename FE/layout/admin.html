@@ -348,7 +348,7 @@ table {
     event.preventDefault();
     
     const myHeaders = new Headers();
-    myHeaders.append("Cookie", "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM2ZmZkMDVlYjljNjMyNmE3ZWJmMTAiLCJlbWFpbCI6InBoYXRAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMyMDI1MzA0LCJleHAiOjE3MzIwNTQxMDR9.eXoPg7rgujXULNu_8dd42NUpmfmlH6OMHpxl5pWD4u4; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM2ZmZkMDVlYjljNjMyNmE3ZWJmMTAiLCJlbWFpbCI6InBoYXRAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzMyMDI1MzA0LCJleHAiOjE3MzIwNTQxMDR9.eXoPg7rgujXULNu_8dd42NUpmfmlH6OMHpxl5pWD4u4");
+    myHeaders.append("Authorization", `Bearer ${getCookie('token')}`);
     
     const formData = new FormData();
     
