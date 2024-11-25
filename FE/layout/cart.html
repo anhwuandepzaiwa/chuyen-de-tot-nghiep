@@ -33,33 +33,49 @@
         }).format(price);
     }
     function updateQuantity(productId, quantity){
-        const token = getCookie('token');
-        let currentQuantity = document.querySelector(`input[data-product-id="${productId}"]`);
-        console.log(currentQuantity);
-        // Chuyển đổi sang số
-        currentQuantity = parseInt(currentQuantity);
-        
-        // Kiểm tra nếu đang giảm số lượng và số lượng hiện tại là 1
-        if (quantity < currentQuantity && currentQuantity === 1) {
-            console.log("Không thể giảm số lượng dưới 1");
-            return;
-        }
+    const token = getCookie('token');
+    console.log(quantity);
 
-        // Cập nhật số lượng mới
-        let newQuantity = quantity > currentQuantity ? currentQuantity + 1 : currentQuantity - 1;
-        
-        // Cập nhật hiển thị số lượng trên input
-        document.querySelector(`input[data-product-id="${productId}"]`).value = newQuantity;
-        
-        // Cập nhật tổng giá
-        const priceElement = document.querySelector(`[data-price-id="${productId}"]`);
-        const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
-        const newTotal = unitPrice * newQuantity;
-        priceElement.textContent = formatPrice(newTotal);
-        
-        // Cập nhật tổng giỏ hàng
-        updateCartTotal();
-    }   
+    // Lấy số lượng hiện tại từ phần tử hiển thị (span) có data-product-id
+    const quantityElement = document.querySelector(`span[data-product-id="${productId}"]`);
+    
+    if (!quantityElement) {
+        console.error(`Không tìm thấy phần tử với data-product-id="${productId}"`);
+        return;
+    }
+
+    let currentQuantity = parseInt(quantityElement.textContent);
+    console.log(currentQuantity);
+    
+    // Kiểm tra nếu đang giảm số lượng và số lượng hiện tại là 1
+    if (quantity < currentQuantity && currentQuantity === 1) {
+        console.log("Không thể giảm số lượng dưới 1");
+        return;
+    }
+
+    // Cập nhật số lượng mới
+    let newQuantity = quantity > currentQuantity ? currentQuantity + 1 : currentQuantity - 1;
+    
+    // Cập nhật hiển thị số lượng trên thẻ có class mx-2 (vì class này là nơi hiển thị số lượng)
+    quantityElement.textContent = newQuantity;
+
+    // Cập nhật hiển thị số lượng trên input (nếu bạn muốn cập nhật cả input nữa)
+    const inputElement = document.querySelector(`input[data-product-id="${productId}"]`);
+    if (inputElement) {
+        inputElement.value = newQuantity;
+    }
+
+    // Cập nhật tổng giá
+    const priceElement = document.querySelector(`[data-price-id="${productId}"]`);
+    const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
+    const newTotal = unitPrice * newQuantity;
+    priceElement.textContent = formatPrice(newTotal);
+    
+    // Cập nhật tổng giỏ hàng
+    updateCartTotal();
+}
+
+
     function loadCart() {
         console.log("LoadCart function called");
         const token = getCookie('token');
@@ -111,7 +127,7 @@
                         </div>
                         <div class="col-md-2">
                             <div class="price-section">
-                                <span class="current-price">${formatPrice(item.price)}</span>
+                                <span class="current-price">${formatPrice(item.discountedPrice)}</span>
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -120,7 +136,7 @@
                                     onclick="updateQuantity('${item.productId}', ${item.quantity - 1})">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <span class="mx-2">${item.quantity}</span>
+                                <span class="mx-2" data-product-id="123">${item.quantity}</span>
                                 <button class="btn btn-outline-secondary btn-sm" 
                                     onclick="updateQuantity('${item.productId}', ${item.quantity + 1})">
                                     <i class="fas fa-plus"></i>
@@ -129,7 +145,7 @@
                         </div>
                         <div class="col-md-2">
                             <div class="d-flex flex-column align-items-end">
-                                <span class="fw-bold mb-2">${formatPrice(item.price * item.quantity)}</span>
+                                <span class="fw-bold mb-2">${formatPrice(item.discountedPrice * item.quantity)}</span>
                                 <button class="btn btn-link text-danger p-0" 
                                     onclick="removeFromCart('${item._id}')">
                                     <i class="fas fa-trash-alt"></i> Xóa
