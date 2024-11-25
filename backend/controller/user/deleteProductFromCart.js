@@ -2,13 +2,11 @@ const addToCartModel = require("../../models/cartProduct")
 
 const deleteProductFromCart = async (req, res) => {
     try {
-        const currentUser = req.userId;  // Lấy userId từ request (thông qua middleware hoặc token)
-        const { productId } = req.query;  // Lấy productId từ query parameters
+        const { productId } = req.query;  
 
-        // Tìm và xóa sản phẩm khỏi giỏ hàng của người dùng
         const cartItem = await addToCartModel.findOneAndDelete({
-            userId: currentUser,
-            productId: productId,  // Kiểm tra theo userId và productId
+            userId: req.userId,
+            productId: productId, 
         });
 
         if (!cartItem) {

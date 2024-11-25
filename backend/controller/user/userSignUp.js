@@ -11,12 +11,12 @@ async function userSignUpController(req, res) {
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if(!email) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Vui lòng cung cấp email",
                 success: false
             });
         }else if (!emailRegex.test(email)) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Email không hợp lệ. Vui lòng nhập đúng định dạng email.",
                 success: false
             });
@@ -24,25 +24,25 @@ async function userSignUpController(req, res) {
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if(!password) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Vui lòng cung cấp mật khẩu",
                 success: false
             });
         }else if (!passwordRegex.test(password)) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Mật khẩu phải bao gồm ít nhất 8 ký tự một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.",
                 success: false
             });
         }
 
         if (!confirmPassword) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Vui lòng cung cấp xác nhận mật khẩu",
                 success: false
             });
         }
         else if (password !== confirmPassword) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Mật khẩu và xác nhận mật khẩu không khớp",
                 success: false
             });
@@ -50,7 +50,10 @@ async function userSignUpController(req, res) {
         
         const nameRegex = /^[a-zA-Z0-9\s]{2,50}$/;
         if(!name){
-            throw new Error("Vui lòng cung cấp tên của bạn");
+            return res.status(400).json({
+                message: "Vui lòng cung cấp tên",
+                success: false
+            });
         }else if (!nameRegex.test(name)) {
             return res.status(400).json({
                 message: "Tên phải chứa ít nhất 2 ký tự và không chứa ký tự đặc biệt.",
