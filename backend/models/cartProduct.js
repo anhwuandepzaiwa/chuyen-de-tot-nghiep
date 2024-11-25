@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const addToCart = mongoose.Schema({
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
     quantity: { type: Number, required: true },
-    userId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     selectedColor: { type: String },
     selectedGift: { type: String },
 }, {
