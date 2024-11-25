@@ -6,7 +6,6 @@ const searchProduct = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
 
-        // Kiểm tra nếu không có từ khóa tìm kiếm
         if (!query) {
             return res.status(400).json({
                 message: "Vui lòng nhập từ khóa tìm kiếm",

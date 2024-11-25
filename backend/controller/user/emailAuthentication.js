@@ -16,7 +16,6 @@ async function confirmEmailController(req, res) {
         // Verify the token
         jwt.verify(token, process.env.TOKEN_SECRET_KEY, async (err, decoded) => {
             if (err) {
-                console.error("Xác nhận token thất bại", err.message);
                 return res.status(400).json({
                     message: "Liên kết xác nhận không hợp lệ hoặc đã hết hạn.",
                     success: false

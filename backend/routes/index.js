@@ -56,7 +56,7 @@ router.post("/check-transaction-status-momo", checkTransactionStatus);
 
 // auth
 router.post("/signup", signUpLimiter, userSignUpController);
-router.post("/signin", userSignInController);
+router.post("/signin", signUpLimiter, userSignInController);
 router.post("/forgot-password", forgotPasswordController);
 router.post("/reset-password", resetPassword);
 router.post("/verify-otp", verifyOtpController);

@@ -14,14 +14,20 @@ async function updateProductController(req, res) {
 
         const product = await productModel.findById(_id);
         if (!product) {
-            throw new Error("Sản phẩm không tồn tại");
+            return res.status(404).json({
+                message: "Sản phẩm không tồn tại",
+                success: false,
+            });
         }
 
         let currentImages = product.productImage || [];
 
         if (req.files && req.files.length > 0) {
             if (!replaceImageIndexes || replaceImageIndexes.length !== req.files.length) {
-                throw new Error("Số lượng chỉ mục hình ảnh cần thay thế không khớp với số lượng hình ảnh đã tải lên");
+                return res.status(404).json({
+                    message: "Số lượng chỉ mục hình ảnh cần thay thế không khớp với số lượng hình ảnh đã tải lên",
+                    success: false,
+                });
             }
 
             for (let i = 0; i < replaceImageIndexes.length; i++) {
@@ -29,7 +35,11 @@ async function updateProductController(req, res) {
                 if (index >= 0 && index < currentImages.length) {
                     currentImages[index] = req.files[i].path; 
                 } else {
-                    throw new Error(`Chỉ mục hình ảnh không hợp lệ: ${index}`);
+                    return res.status(404).json({
+                        message: "Chỉ mục hình ảnh không hợp lệ: " + index,
+                        success: false
+                    });
+                  
                 }
             }
 

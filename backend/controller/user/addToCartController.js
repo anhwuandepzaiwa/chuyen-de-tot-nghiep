@@ -23,7 +23,6 @@ const addToCartController = async (req, res) => {
             });
         }
 
-        // Kiểm tra màu sắc hợp lệ
         if (selectedColor && !product.availableColors.includes(selectedColor)) {
             return res.status(400).json({
                 message: "Màu sắc đã chọn không hợp lệ",
@@ -32,7 +31,6 @@ const addToCartController = async (req, res) => {
             });
         }
 
-        // Kiểm tra quà tặng hợp lệ
         if (selectedGift && !product.giftItems.includes(selectedGift)) {
             return res.status(400).json({
                 message: "Quà tặng đã chọn không hợp lệ",
@@ -40,7 +38,6 @@ const addToCartController = async (req, res) => {
             });
         }
 
-        // Kiểm tra tồn kho
         if (quantity > product.stock) {
             return res.status(400).json({
                 message: `Chỉ còn ${product.stock} sản phẩm trong kho`,
@@ -48,7 +45,6 @@ const addToCartController = async (req, res) => {
             });
         }
 
-        // Kiểm tra sản phẩm đã tồn tại trong giỏ hàng
         const isProductAvailable = await addToCartModel.findOne({
             productId,
             userId: req.userId,

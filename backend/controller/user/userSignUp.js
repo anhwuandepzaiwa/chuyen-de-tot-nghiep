@@ -22,7 +22,7 @@ async function userSignUpController(req, res) {
             });
         }
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,50}$/;
         if(!password) {
             return res.status(400).json({
                 message: "Vui lòng cung cấp mật khẩu",

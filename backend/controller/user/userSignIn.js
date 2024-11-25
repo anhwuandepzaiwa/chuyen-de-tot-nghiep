@@ -10,12 +10,12 @@ async function userSignInController(req,res)
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if(!email) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Vui lòng cung cấp email",
                 success: false
             });
         }else if (!emailRegex.test(email)) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Email không hợp lệ. Vui lòng nhập đúng định dạng email.",
                 success: false
             });
@@ -23,12 +23,12 @@ async function userSignInController(req,res)
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if(!password) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Vui lòng cung cấp mật khẩu",
                 success: false
             });
         }else if (!passwordRegex.test(password)) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Mật khẩu phải bao gồm ít nhất 8 ký tự một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.",
                 success: false
             });
@@ -43,7 +43,7 @@ async function userSignInController(req,res)
         }
         
         if(!password){
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Vui lòng cung cấp mật khẩu",
                 success: false
             });
@@ -88,7 +88,7 @@ async function userSignInController(req,res)
         }
         else
         {
-            res.status(400).json({
+            return res.status(400).json({
                 message : "Mật khẩu không chính xác",
                 success : false
             });
