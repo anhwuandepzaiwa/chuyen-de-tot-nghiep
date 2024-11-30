@@ -1,0 +1,71 @@
+const Promotion = require("../../models/promotionSchema");
+const addToCartModel = require("../../models/cartProduct");
+
+const applyDiscountCode = async (req, res) => {
+    try {
+        const { discountCode } = req.body;
+        const userId = req.userId;
+
+        const promotion = await Promotion.findOne({ code: discountCode });
+        if (!promotion) {
+            return res.status(400).json({
+                message: "Mã giảm giá không tồn tại.",
+                error: true,
+                success: false,
+            });
+        }
+
+        // Kiểm tra tính hợp lệ của mã giảm giá
+        if (!promotion.isActive || new Date() < promotion.startDate || (promotion.endDate && new Date() > promotion.endDate)) {
+            return res.status(400).json({
+                message: "Mã giảm giá không hợp lệ hoặc đã hết hạn.",
+                error: true,
+                success: false,
+            });
+        }
+
+        const { totalAmount } = req.body; 
+
+        if (totalAmount < promotion.minOrderValue) {
+            return res.status(400).json({
+                message: `Mã giảm giá chỉ áp dụng cho đơn hàng tối thiểu ${promotion.minOrderValue} VNĐ.`,
+                error: true,
+                success: false,
+            });
+        }
+
+        let discountAmount = 0;
+        if (promotion.discountType === "percentage") {
+            discountAmount = (totalAmount * promotion.discountValue) / 100;
+        } else if (promotion.discountType === "fixed") {
+            discountAmount = promotion.discountValue;
+        }
+
+        discountAmount = Math.min(discountAmount, totalAmount);
+        const finalAmount = totalAmount - discountAmount;
+
+        
+        promotion.usedCount += 1;
+        await promotion.save();
+
+        // Trả về kết quả
+        res.json({
+            data: {
+                totalAmount,
+                discountAmount,
+                finalAmount,
+            },
+            success: true,
+            error: false,
+        });
+    } catch (err) {
+        // Xử lý lỗi
+        res.status(500).json({
+            message: err.message || "Đã xảy ra lỗi.",
+            error: true,
+            success: false,
+        });
+    }
+};
+
+module.exports = applyDiscountCode;

@@ -2,6 +2,7 @@ const express = require('express')
 
 const router = express.Router()
 
+const applyDiscountCode = require('../controller/order/applyDiscountCode')
 const upload = require('../config/uploadConfig');
 const userSignUpController = require("../controller/user/userSignUp")
 const userSignInController = require('../controller/user/userSignIn')
@@ -54,6 +55,7 @@ router.post("/paymentMomo", createPayment);
 router.post("/callbackMomo", handleCallback);
 router.post("/check-transaction-status-momo", checkTransactionStatus);
 
+router.post("/cart/apply-discount", applyDiscountCode)
 // auth
 router.post("/signup", signUpLimiter, userSignUpController);
 router.post("/signin", signUpLimiter, userSignInController);

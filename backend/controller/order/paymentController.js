@@ -9,7 +9,7 @@ exports.createOrder = async (req, res) => {
     const { amount, app_user } = req.body;
 
     const transID = Math.floor(Math.random() * 1000000);
-    const embed_data = { redirecturl: 'https://prender.com' };
+    const embed_data = { redirecturl: 'https://example.com/redirect' };
     const items = [];
 
     const order = {
@@ -20,7 +20,7 @@ exports.createOrder = async (req, res) => {
       item: JSON.stringify(items),
       embed_data: JSON.stringify(embed_data),
       amount,
-      callback_url: 'https://0bb3-2405-4802-1d17-17d0-60c3-1ee5-1142-9ad4.ngrok-free.app/api/callbackZalo',
+      callback_url: 'https://e981-113-185-54-133.ngrok-free.app/api/callbackZalo',
       description: `Payment for order #${transID}`,
       bank_code: '',
     };
